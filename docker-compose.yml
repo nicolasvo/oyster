@@ -1,0 +1,23 @@
+version: '3'
+services:
+  server:
+    build:
+      context: ./oyster-server/
+      dockerfile: Dockerfile
+    image: ostra-server
+    container_name: server
+    ports:
+      - "3000:3000"
+
+  front:
+    build:
+      context: ./oyster-front/
+      dockerfile: Dockerfile
+    image: ostra-front
+    container_name: front
+    ports:
+      - "80:80"
+    links:
+      - server
+    environment:
+      - API_URL=http://localhost:3000/

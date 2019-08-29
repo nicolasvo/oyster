@@ -89,7 +89,7 @@
         this.languages = JSON.parse(localStorage.getItem('languages'))
       }
 
-      axios.get(process.env.API_URL).then(result => this.words = result.data.data)
+      axios.get(process.env.VUE_APP_API_URL).then(result => this.words = result.data.data)
 
       this.headers = []
       for (const language of Object.keys(this.words[0])) {
@@ -99,16 +99,14 @@
       }
       this.headers.push({ text: ' ', value: 'action', sortable: false, align: 'right' })
 
-      axios.get(process.env.ROOT_API + 'languages').then(result => this.languages = result.data.data)
-      console.log('prout', Object.keys(this.words[0]));
-      console.log(this.editedWord);
+      axios.get(process.env.VUE_APP_API_URL + 'languages').then(result => this.languages = result.data.data)
     },
 
     mounted () {
       if (localStorage.getItem('words')) {
         this.words = JSON.parse(localStorage.getItem('words'))
       }
-      axios.get(process.env.ROOT_API).then(result => this.words = result.data.data)
+      axios.get(process.env.VUE_APP_API_URL).then(result => this.words = result.data.data)
     },
 
     computed: {

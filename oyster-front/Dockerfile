@@ -1,7 +1,7 @@
 FROM node:alpine
 COPY ./ /app
 WORKDIR /app
-RUN yarn && yarn run build
+RUN yarn && yarn build
 
 FROM nginx:alpine
 RUN mkdir /app

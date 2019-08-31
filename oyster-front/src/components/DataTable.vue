@@ -70,6 +70,14 @@
 <script>
   import axios from 'axios'
 
+  const api = axios.create({
+    baseURL: process.env.VUE_APP_API_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    }
+  })
+
   export default {
     data: () => ({
       dialog: false,
@@ -88,8 +96,9 @@
       if (localStorage.getItem('languages')) {
         this.languages = JSON.parse(localStorage.getItem('languages'))
       }
-
-      axios.get(process.env.VUE_APP_API_URL).then(result => this.words = result.data.data)
+      api.get('/').then(result => {
+        this.words = result.data.data
+      })
 
       this.headers = []
       for (const language of Object.keys(this.words[0])) {
@@ -99,14 +108,14 @@
       }
       this.headers.push({ text: ' ', value: 'action', sortable: false, align: 'right' })
 
-      axios.get(process.env.VUE_APP_API_URL + 'languages').then(result => this.languages = result.data.data)
+      api.get('/languages').then(result => this.languages = result.data.data)
     },
 
     mounted () {
       if (localStorage.getItem('words')) {
         this.words = JSON.parse(localStorage.getItem('words'))
       }
-      axios.get(process.env.VUE_APP_API_URL).then(result => this.words = result.data.data)
+      api.get('/').then(result => this.words = result.data.data)
     },
 
     computed: {
@@ -114,22 +123,21 @@
         return this.editedIndex === -1   ? 'New Word' : 'Edit Word'
       },
       isMobile() {
-        const isMobile = window.matchMedia("only screen and (max-width: 760px)")
+        const isMobile = window.matchMedia("only screen and (max-width: 500px)")
         return (isMobile.matches) ? -1 : 20
       }
     },
 
     watch: {
-      dialog (val) {
+      dialog(val) {
         val || this.close()
       },
       words: {
-        handler() {
-          console.log('Words updated.')
-          localStorage.setItem('words', JSON.stringify(this.words))
-          localStorage.setItem('languages', JSON.stringify(this.languages))
-        },
         deep: true,
+        handler() {
+          localStorage.setItem('languages', JSON.stringify(this.languages))
+          localStorage.setItem('words', JSON.stringify(this.words))
+        }
       }
     },
 

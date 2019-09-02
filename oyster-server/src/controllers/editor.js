@@ -18,8 +18,7 @@ module.exports = class Editor {
         const data = [];
         let temp = {};
         const zip = (a, b) => a.map((x, i) => [x, b[i]]);
-
-        for (const row of result.slice(1, -1)) {
+        for (const row of result.slice(1)) {
           temp = {};
           for (const [language, word] of zip(languages, row)) {
             temp[language] = word;
@@ -55,7 +54,7 @@ module.exports = class Editor {
       }
     }
 
-    const result = await this.sheets.appendValues(
+    await this.sheets.appendValues(
       this.spreadsheetId,
       'A1',
       'USER_ENTERED',

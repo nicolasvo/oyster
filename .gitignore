@@ -1,6 +1,7 @@
 keys.json
 sheets_id.json
 .idea/
+dist/
 
 # Logs
 logs

@@ -1,11 +1,10 @@
 <template>
   <v-data-table
-    dense
     :headers="headers"
     :items="words"
     class="elevation-1"
     mobile-breakpoint=100
-    v-bind="{ 'items-per-page': isMobile }"
+    v-bind="{ 'items-per-page': isMobile, 'dense': isDense }"
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
@@ -89,43 +88,46 @@
       defaultItem: {},
     }),
 
-    created () {
+    created() {
       if (localStorage.getItem('words')) {
         this.words = JSON.parse(localStorage.getItem('words'))
       }
       if (localStorage.getItem('languages')) {
         this.languages = JSON.parse(localStorage.getItem('languages'))
       }
+
       api.get('/').then(result => {
         this.words = result.data.data
+        this.headers = []
+        for (const language of Object.keys(this.words[0])) {
+          this.headers.push({'text': language, 'value': language})
+          this.editedWord[language] = ''
+          this.defaultItem[language] = ''
+        }
+        this.headers.push({text: '', value: 'action', sortable: false, align: 'right'})
       })
-
-      this.headers = []
-      for (const language of Object.keys(this.words[0])) {
-        this.headers.push({'text': language, 'value': language})
-        this.editedWord[language] = ''
-        this.defaultItem[language] = ''
-      }
-      this.headers.push({ text: ' ', value: 'action', sortable: false, align: 'right' })
 
       api.get('/languages').then(result => this.languages = result.data.data)
     },
 
-    mounted () {
+    mounted() {
       if (localStorage.getItem('words')) {
         this.words = JSON.parse(localStorage.getItem('words'))
       }
-      api.get('/').then(result => this.words = result.data.data)
     },
 
     computed: {
-      formTitle () {
-        return this.editedIndex === -1   ? 'New Word' : 'Edit Word'
+      formTitle() {
+        return this.editedIndex === -1 ? 'New Word' : 'Edit Word'
       },
       isMobile() {
         const isMobile = window.matchMedia("only screen and (max-width: 500px)")
         return (isMobile.matches) ? -1 : 20
-      }
+      },
+      isDense() {
+        const isMobile = window.matchMedia("only screen and (max-width: 500px)")
+        return (!isMobile.matches)
+      },
     },
 
     watch: {
@@ -135,25 +137,34 @@
       words: {
         deep: true,
         handler() {
-          localStorage.setItem('languages', JSON.stringify(this.languages))
           localStorage.setItem('words', JSON.stringify(this.words))
+        }
+      },
+      languages: {
+        deep: true,
+        handler() {
+          localStorage.setItem('languages', JSON.stringify(this.languages))
         }
       }
     },
 
     methods: {
-      editItem (item) {
+      editItem(item) {
         this.editedIndex = this.words.indexOf(item)
         this.editedWord = Object.assign({}, item)
         this.dialog = true
       },
 
-      deleteItem (item) {
+      deleteItem(item) {
         const index = this.words.indexOf(item)
-        this.words.splice(index, 1)
+        confirm('Are you sure you want to delete this item?') && api.post('/remove', {
+          rows: [index + 2],
+        }).then(
+          () => console.log('Row removed!')
+        ) && this.words.splice(index, 1)
       },
 
-      close () {
+      close() {
         this.dialog = false
         setTimeout(() => {
           this.editedWord = Object.assign({}, this.defaultItem)
@@ -161,11 +172,56 @@
         }, 300)
       },
 
-      save () {
+      save() {
         if (this.editedIndex > -1) {
           Object.assign(this.words[this.editedIndex], this.editedWord)
+          api.post('/update', {
+            data: [{
+              row: this.editedIndex + 2,
+              values: Object.values(this.editedWord)
+            }]
+          }).then(
+            () => console.log('Word updated!')
+          )
         } else {
-          this.words.push(this.editedWord)
+          const isEmpty = Object.values(this.editedWord).every(x => (x === null || x === ''))
+          if (!isEmpty) {
+            let from_lang
+            let word
+            let counter = 0
+            for (const key of Object.keys(this.editedWord)) {
+              if (this.editedWord[key] !== '') {
+                from_lang = key
+                word = this.editedWord[key]
+                counter++
+              }
+            }
+            if (counter === 1) {
+              api.post('/append', {
+                word: word,
+                from_lang: from_lang
+              }).then(
+                () => {
+                  console.log('Word appended!')
+                  setTimeout(() => {
+                    api.get('/').then(result => {
+                      this.words = result.data.data
+                    })
+                  }, 500)
+                }
+              )
+            } else {
+              api.post('/update', {
+                data: [{
+                  row: this.words.length + 2,
+                  values: Object.values(this.editedWord)
+                }]
+              }).then(
+                () => console.log('Word updated!')
+              )
+              this.words.push(this.editedWord)
+            }
+          }
         }
         this.close()
       },

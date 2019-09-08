@@ -89,25 +89,31 @@
     }),
 
     created() {
-      if (localStorage.getItem('words')) {
-        this.words = JSON.parse(localStorage.getItem('words'))
-      }
       if (localStorage.getItem('languages')) {
         this.languages = JSON.parse(localStorage.getItem('languages'))
-      }
-
-      api.get('/').then(result => {
-        this.words = result.data.data
-        this.headers = []
-        for (const language of Object.keys(this.words[0])) {
+        for (const language of this.languages) {
           this.headers.push({'text': language, 'value': language})
           this.editedWord[language] = ''
           this.defaultItem[language] = ''
         }
-        this.headers.push({text: '', value: 'action', sortable: false, align: 'right'})
-      })
+      }
+      if (localStorage.getItem('words')) {
+        this.words = JSON.parse(localStorage.getItem('words'))
+      }
 
-      api.get('/languages').then(result => this.languages = result.data.data)
+      api.get('/languages').then(result => {
+        this.languages = result.data.data
+        api.get('/').then(result => {
+          this.words = result.data.data
+          this.headers = []
+          for (const language of this.languages) {
+            this.headers.push({'text': language, 'value': language})
+            this.editedWord[language] = ''
+            this.defaultItem[language] = ''
+          }
+          this.headers.push({text: '', value: 'action', sortable: false, align: 'right'})
+        })
+      })
     },
 
     mounted() {

@@ -4,7 +4,7 @@
     :items="words"
     class="elevation-1"
     mobile-breakpoint=100
-    v-bind="{ 'items-per-page': isMobile, 'dense': isDense }"
+    v-bind="{ 'items-per-page': -1, 'dense': isDense }"
   >
     <template v-slot:top>
       <v-toolbar flat color="white">
@@ -163,7 +163,7 @@
 
       deleteItem(item) {
         const index = this.words.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && api.post('/remove', {
+        api.post('/remove', {
           rows: [index + 2],
         }).then(
           () => console.log('Row removed!')

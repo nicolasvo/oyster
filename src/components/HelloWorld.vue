@@ -30,10 +30,10 @@ function initClient() {
   var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",];
   var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
   gapi.client.init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      discoveryDocs: DISCOVERY_DOCS,
-      scope: SCOPES,
+    apiKey: API_KEY,
+    clientId: CLIENT_ID,
+    discoveryDocs: DISCOVERY_DOCS,
+    scope: SCOPES,
   })
   .then(function () {
       gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);

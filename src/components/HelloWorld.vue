@@ -28,7 +28,7 @@ function initClient() {
   var CLIENT_ID = "582485760308-aim00v0sor96v66bn2h4rgerqo1f1g74.apps.googleusercontent.com";
   var API_KEY = "AIzaSyBUANl-jEVX7FlqOIGr3hVYrH3WUwvLFtU";
   var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",];
-  var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+  var SCOPES = "https://www.googleapis.com/auth/spreadsheets";
   gapi.client.init({
     apiKey: API_KEY,
     clientId: CLIENT_ID,
@@ -40,39 +40,51 @@ function initClient() {
       updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
     },
     function (error) {
-      appendPre(JSON.stringify(error, null, 2));
+      console.log(JSON.stringify(error, null, 2));
     }
   );
 }
 
 function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
-    console.log("... i'm signed in!");
-    listMajors();
+    getWords();
   } else {
     gapi.auth2.getAuthInstance().signIn();
   }
 }
-
-function listMajors() {
+const spreadsheetId = '1CvbZsBsC-vqbqLyM8ov0B5O0SM-D3EB3zo6PJJYUpqs';
+function getWords() {
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-    range: 'Class Data!A2:E',
+    spreadsheetId: spreadsheetId,
+    // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+    range: 'A1:C',
   }).then(function(response) {
-    var range = response.result;
+    const range = response.result;
     if (range.values.length > 0) {
-      console.log('Name, Major:');
       console.log(range.values.length);
-      for (var i = 0; i < range.values.length; i++) {
-        var row = range.values[i];
-        console.log(row[0] + ', ' + row[1]);
+      const languages = range.values[0];
+      const data = [];
+      let temp = {};
+      const zip = (a, b) => a.map((x, i) => [x, b[i]]);
+      for (const row of range.values.slice(1)) {
+        temp = {};
+        for (const [language, word] of zip(languages, row)) {
+          temp[language] = word;
+        }
+        data.push(temp);
       }
+      // console.log(data);
+      return data;
     } else {
       console.log('No data found.');
     }
   }, function(response) {
     console.log('Error: ' + response.result.error.message);
   });
+}
+
+function addWord() {
+  
 }
 </script>
 

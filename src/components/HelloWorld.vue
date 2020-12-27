@@ -16,8 +16,8 @@ export default {
   }),
   beforeCreate() {
     handleClientLoad().then(async () => {
-      this.words = await getWords()[0];
-      // this.words = "hmm ziegel";
+      this.words = await getWords();
+      console.log(this.words);
     });
     // addWord("desert", "en");
     // updateWord("desesrt", 0, 5);

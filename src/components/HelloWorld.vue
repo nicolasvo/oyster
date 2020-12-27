@@ -84,8 +84,8 @@ export default {
             }), 500);
             this.newWords[language] = "";
           });
+          break;
         }
-        break;
       }
       // addWord("sun", "en").then(() => {
       //   setTimeout(getWords().then(words => {

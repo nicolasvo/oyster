@@ -1,6 +1,14 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <form v-on:submit.prevent="buttonAddWord">
+      <div v-for="language in languages" :key="language">
+        <label>{{ language }}</label>
+        <input v-model="newWords[language]" :placeholder="inputText">
+        <br>
+      </div>
+      <input type="submit" value="add word">
+    </form>
     <table>
       <thead>
         <tr>
@@ -10,15 +18,19 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="word in words" :key="word">
+        <tr v-for="(word, index) in words" :key="word">
           <td v-for="language in languages" :key="language">
             {{ word[language] }}
+          </td>
+          <td>
+            <button v-on:click="buttonDeleteWord(index + 1)">delete</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -29,17 +41,68 @@ export default {
   data: () => ({
     words: [],
     languages: [],
+    newWords: new Map(),
+    inputText: "",
   }),
   beforeCreate() {
   },
   created() {
     handleClientLoad().then(async () => {
+      this.languages = await getLanguages();
       this.words = await getWords();
       console.log(this.words);
-      this.languages = await getLanguages();
+      this.languages.forEach(language => {
+        this.newWords.set(language, "");
+      });
+      console.log(this.newWords);
     });
   },
   mounted() {
+  },
+  methods: {
+    // buttonAddWord () {
+    //   addWord("sun", "en").then(() => {
+    //     setTimeout(getWords().then(words => {
+    //       this.words = words;
+    //     }), 500);
+    //   });
+    // },
+    buttonDeleteWord (rowIndex) {
+      deleteWord(rowIndex).then(() => {
+        setTimeout(getWords().then(words => {
+          this.words = words;
+        }), 500);
+      });
+    },
+    buttonAddWord () {
+      for (let language of this.languages) {
+        const word = this.newWords[language];
+        if (word) {
+          addWord(word, language).then(() => {
+            setTimeout(getWords().then(words => {
+              this.words = words;
+            }), 500);
+            this.newWords[language] = "";
+          });
+        }
+        break;
+      }
+      // addWord("sun", "en").then(() => {
+      //   setTimeout(getWords().then(words => {
+      //     this.words = words;
+      //   }), 500);
+      // });
+    },
+    // test () {
+    //   this.languages.forEach(language => {
+    //     console.log(this.newWords[language]);
+    //   });
+    // },
+  },
+  watch: {
+    words: {
+      deep:true,
+    }
   },
 };
 
@@ -80,8 +143,8 @@ function updateSigninStatus(isSignedIn) {
 }
 
 function getWords() {
-  return new Promise((resolve, reject) => {
-    gapi.client.sheets.spreadsheets.values.get({
+  return new Promise(async (resolve, reject) => {
+    await gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
       range: range,
     }).then(function(response) {
@@ -109,52 +172,58 @@ function getWords() {
   });
 }
 
-async function addWord(word, fromLanguage) {
-  let fromLanguageIndex = -1;
-  const languages = await getLanguages();
-  fromLanguageIndex = languages.indexOf(fromLanguage);
-  console.log(fromLanguageIndex);
-  let values = [];
-  for (let col = 0; col < languages.length; col++) {
-    if (col !== fromLanguageIndex) {
-      values.push(`=GOOGLETRANSLATE("${word}", "${fromLanguage}", "${languages[col]}")`);
-    } else {
-      values.push(word);
+function addWord(word, fromLanguage) {
+  return new Promise(async (resolve, reject) => {
+    let fromLanguageIndex = -1;
+    const languages = await getLanguages();
+    fromLanguageIndex = languages.indexOf(fromLanguage);
+    console.log(fromLanguageIndex);
+    let values = [];
+    for (let col = 0; col < languages.length; col++) {
+      if (col !== fromLanguageIndex) {
+        values.push(`=GOOGLETRANSLATE("${word}", "${fromLanguage}", "${languages[col]}")`);
+      } else {
+        values.push(word);
+      }
     }
-  }
-  console.log(values);
-  const params = {
-    spreadsheetId: spreadsheetId,
-    range: range,
-    valueInputOption: "USER_ENTERED",  
-  };
-  const valueRangeBody = {
-    range: "A1:Z",
-    majorDimension: "ROWS",
-    values: [values],
-  };
-  await gapi.client.sheets.spreadsheets.values.append(params, valueRangeBody).then(function(response) {
-    console.log("Word added!");
+    console.log(values);
+    const params = {
+      spreadsheetId: spreadsheetId,
+      range: range,
+      valueInputOption: "USER_ENTERED",  
+    };
+    const valueRangeBody = {
+      range: "A1:Z",
+      majorDimension: "ROWS",
+      values: [values],
+    };
+    await gapi.client.sheets.spreadsheets.values.append(params, valueRangeBody).then(function(response) {
+      console.log("Word added!");
+      resolve("boi");
+    });
   });
 }
 
-async function deleteWord(rowIndex) {
-  const params = {
-    spreadsheetId: spreadsheetId,
-  };
-  const requestBody = {
-    requests: [{
-      deleteRange: {
-        range: {
-          startRowIndex: rowIndex,
-          endRowIndex: rowIndex+1,
-        },
-        shiftDimension: "ROWS",
-      }
-    }]
-  };
-  await gapi.client.sheets.spreadsheets.batchUpdate(params, requestBody).then(function(response) {
-    console.log("Word deleted!");
+function deleteWord(rowIndex) {
+  return new Promise(async (resolve, reject) => {
+    const params = {
+      spreadsheetId: spreadsheetId,
+    };
+    const requestBody = {
+      requests: [{
+        deleteRange: {
+          range: {
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex+1,
+          },
+          shiftDimension: "ROWS",
+        }
+      }]
+    };
+    await gapi.client.sheets.spreadsheets.batchUpdate(params, requestBody).then(function(response) {
+      console.log("Word deleted!");
+      resolve("boi");
+    });
   });
 }
 

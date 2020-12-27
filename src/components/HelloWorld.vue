@@ -1,7 +1,22 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>{{ words }}</p>
+    <table>
+      <thead>
+        <tr>
+          <th v-for="language in languages" :key="language">
+            {{ language }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="word in words" :key="word">
+          <td v-for="language in languages" :key="language">
+            {{ word[language] }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -12,17 +27,17 @@ export default {
     msg: String,
   },
   data: () => ({
-    words: "jesus",
+    words: [],
+    languages: [],
   }),
   beforeCreate() {
+  },
+  created() {
     handleClientLoad().then(async () => {
       this.words = await getWords();
       console.log(this.words);
+      this.languages = await getLanguages();
     });
-    // addWord("desert", "en");
-    // updateWord("desesrt", 0, 5);
-  },
-  created() {
   },
   mounted() {
   },
@@ -188,6 +203,9 @@ function columnToLetter(column) {
 <style scoped>
 h3 {
   margin: 40px 0 0;
+}
+table {
+  display: inline-block;
 }
 ul {
   list-style-type: none;

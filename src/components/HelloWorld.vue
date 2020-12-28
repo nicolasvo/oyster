@@ -31,9 +31,11 @@
           <span class="text-gray-700">{{ language }}</span>
           <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
         </div>
-        <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
-          Add word
-        </button>
+        <div class="flex justify-center">
+          <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+            Add word
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -55,10 +57,10 @@ export default {
   created() {
     handleClientLoad().then(async () => {
       this.languages = await getLanguages();
-      this.words = await getWords();
       this.languages.forEach(language => {
         this.newWords.set(language, "");
       });
+      this.words = await getWords();
     });
   },
   mounted() {},

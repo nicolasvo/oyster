@@ -1,36 +1,41 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <form v-on:submit.prevent="buttonAddWord">
-      <div v-for="language in languages" :key="language">
-        <label>{{ language }}</label>
-        <input v-model="newWords[language]" :placeholder="inputText">
-        <br>
-      </div>
-      <input type="submit" value="add word">
-    </form>
-    <table>
-      <thead>
-        <tr>
-          <th v-for="language in languages" :key="language">
-            {{ language }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(word, index) in words" :key="word">
-          <td v-for="language in languages" :key="language">
-            {{ word[language] }}
-          </td>
-          <td>
-            <button v-on:click="buttonDeleteWord(index + 1)">delete</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="container flex flex-col space-y-4 justify-center">
+    <h1 class="mt-5 flex justify-center">{{ msg }}</h1>
+    <div class="mt-5 mx-10 flex justify-center">
+      <table class="table-fixed">
+        <thead>
+          <tr>
+            <th v-for="language in languages" :key="language" class="w-3/10 py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+              {{ language }}
+            </th>
+            <th class="w-1/10 py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
+            <td v-for="language in languages" :key="language" class="text-center py-4 px-6 border-b border-grey-light">
+              {{ word[language] }}
+            </td>
+            <td class="py-4 px-6 border-b border-grey-light">
+              <button v-on:click="buttonDeleteWord(index + 1)" class="text-center">delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-center">
+      <form v-on:submit.prevent="buttonAddWord">
+        <div v-for="language in languages" :key="language">
+          <span class="text-gray-700">{{ language }}</span>
+          <input class="mt-0 block px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black" type="text" v-model="newWords[language]" :placeholder="inputText">
+        </div>
+        <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+          Add word
+        </button>
+      </form>
+    </div>
   </div>
 </template>
-
 
 <script>
 export default {
@@ -268,23 +273,3 @@ function columnToLetter(column) {
   return letter;
 }
 </script>
-
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-table {
-  display: inline-block;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

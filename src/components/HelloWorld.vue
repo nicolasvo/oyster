@@ -110,13 +110,14 @@ function handleClientLoad() {
         discoveryDocs: DISCOVERY_DOCS,
         scope: SCOPES,
       }).then(() => {
-          // gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-          // updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
           if (isSignedIn) {
+            console.log("User already signed in!");
             resolve("boi");
           } else {
+            console.log("Requesting sign in...");
             gapi.auth2.getAuthInstance().signIn().then(() => {
+              console.log("User successfully signed in!");
               resolve("boi");
             });
           }

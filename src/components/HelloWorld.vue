@@ -51,21 +51,17 @@ export default {
     newWords: new Map(),
     inputText: "",
   }),
-  beforeCreate() {
-  },
+  beforeCreate() {},
   created() {
     handleClientLoad().then(async () => {
       this.languages = await getLanguages();
       this.words = await getWords();
-      console.log(this.words);
       this.languages.forEach(language => {
         this.newWords.set(language, "");
       });
-      console.log(this.newWords);
     });
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     buttonDeleteWord (rowIndex) {
       deleteWord(rowIndex).then(() => {
@@ -112,9 +108,16 @@ function handleClientLoad() {
         discoveryDocs: DISCOVERY_DOCS,
         scope: SCOPES,
       }).then(() => {
-          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
-          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-          resolve({ isReady: true });
+          // gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+          // updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+          if (isSignedIn) {
+            resolve("boi");
+          } else {
+            gapi.auth2.getAuthInstance().signIn().then(() => {
+              resolve("boi");
+            });
+          }
         },
         function (error) {
           console.log(JSON.stringify(error, null, 2));
@@ -122,14 +125,6 @@ function handleClientLoad() {
       );
     });
   });
-}
-
-function updateSigninStatus(isSignedIn) {
-  if (isSignedIn) {
-    console.log("User signed in!");
-  } else {
-    gapi.auth2.getAuthInstance().signIn();
-  }
 }
 
 function getWords() {
@@ -140,7 +135,6 @@ function getWords() {
     }).then(function(response) {
       const range = response.result;
       if (range.values.length > 0) {
-        console.log(range.values.length);
         const languages = range.values[0];
         const data = [];
         let temp = {};
@@ -167,7 +161,6 @@ function addWord(word, fromLanguage) {
     let fromLanguageIndex = -1;
     const languages = await getLanguages();
     fromLanguageIndex = languages.indexOf(fromLanguage);
-    console.log(fromLanguageIndex);
     let values = [];
     for (let col = 0; col < languages.length; col++) {
       if (col !== fromLanguageIndex) {

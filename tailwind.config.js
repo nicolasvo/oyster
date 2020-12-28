@@ -5,7 +5,6 @@ module.exports = {
     extend: {},
     container: {
       center: true,
-      // padding: '2rem',
     },
   },
   variants: {

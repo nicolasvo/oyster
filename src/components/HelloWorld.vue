@@ -1,22 +1,22 @@
 <template>
   <div class="container flex flex-col space-y-4 justify-center">
     <h1 class="mt-5 flex justify-center">{{ msg }}</h1>
-    <div class="mt-5 mx-10 flex justify-center">
+    <div class="mt-5 flex justify-center">
       <table class="table-fixed">
         <thead>
           <tr>
-            <th v-for="language in languages" :key="language" class="w-3/10 py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+            <th v-for="language in languages" :key="language" class="w-3/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
               {{ language }}
             </th>
-            <th class="w-1/10 py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
+            <th class="w-1/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
-            <td v-for="language in languages" :key="language" class="text-center py-4 px-6 border-b border-grey-light">
+            <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
               {{ word[language] }}
             </td>
-            <td class="py-4 px-6 border-b border-grey-light">
+            <td class="py-2 px-6 border-b border-grey-light">
               <button v-on:click="buttonDeleteWord(index + 1)">
                 <svg class="object-scale-down h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
               </button>
@@ -29,7 +29,7 @@
       <form v-on:submit.prevent="buttonAddWord">
         <div v-for="language in languages" :key="language">
           <span class="text-gray-700">{{ language }}</span>
-          <input class="mt-0 block px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-black" type="text" v-model="newWords[language]" :placeholder="inputText">
+          <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
         </div>
         <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
           Add word
@@ -67,13 +67,6 @@ export default {
   mounted() {
   },
   methods: {
-    // buttonAddWord () {
-    //   addWord("sun", "en").then(() => {
-    //     setTimeout(getWords().then(words => {
-    //       this.words = words;
-    //     }), 500);
-    //   });
-    // },
     buttonDeleteWord (rowIndex) {
       deleteWord(rowIndex).then(() => {
         setTimeout(getWords().then(words => {
@@ -94,17 +87,7 @@ export default {
           break;
         }
       }
-      // addWord("sun", "en").then(() => {
-      //   setTimeout(getWords().then(words => {
-      //     this.words = words;
-      //   }), 500);
-      // });
     },
-    // test () {
-    //   this.languages.forEach(language => {
-    //     console.log(this.newWords[language]);
-    //   });
-    // },
   },
   watch: {
     words: {

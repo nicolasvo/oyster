@@ -1,42 +1,49 @@
 <template>
-  <div class="container flex flex-col space-y-4 justify-center">
+  <div v-if="preflightCheck">
     <h1 class="mt-5 flex justify-center">{{ msg }}</h1>
-    <div class="mt-5 flex justify-center">
-      <table class="table-fixed">
-        <thead>
-          <tr>
-            <th v-for="language in languages" :key="language" class="w-3/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-              {{ language }}
-            </th>
-            <th class="w-1/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
-            <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
-              {{ word[language] }}
-            </td>
-            <td class="py-2 px-6 border-b border-grey-light">
-              <button v-on:click="buttonDeleteWord(index + 1)">
-                <svg class="object-scale-down h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-if="!isSignedIn" class="flex justify-center">
+      <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="buttonSignIn">
+        Sign in 
+      </button>
     </div>
-    <div class="flex justify-center">
-      <form v-on:submit.prevent="buttonAddWord">
-        <div v-for="language in languages" :key="language">
-          <span class="text-gray-700">{{ language }}</span>
-          <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
-        </div>
-        <div class="flex justify-center">
-          <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
-            Add word
-          </button>
-        </div>
-      </form>
+    <div v-else class="container flex flex-col space-y-4 justify-center">
+      <div class="mt-5 flex justify-center">
+        <table class="table-fixed">
+          <thead>
+            <tr>
+              <th v-for="language in languages" :key="language" class="w-3/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                {{ language }}
+              </th>
+              <th class="w-1/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
+              <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
+                {{ word[language] }}
+              </td>
+              <td class="py-2 px-6 border-b border-grey-light">
+                <button v-on:click="buttonDeleteWord(index + 1)">
+                  <svg class="object-scale-down h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="flex justify-center">
+        <form v-on:submit.prevent="buttonAddWord">
+          <div v-for="language in languages" :key="language">
+            <span class="text-gray-700">{{ language }}</span>
+            <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
+          </div>
+          <div class="flex justify-center">
+            <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+              Add word
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -52,16 +59,18 @@ export default {
     languages: [],
     newWords: new Map(),
     inputText: "",
+    preflightCheck: false,
+    isSignedIn: false,
   }),
-  beforeCreate() {},
-  created() {
-    handleClientLoad().then(async () => {
-      this.languages = await getLanguages();
-      this.languages.forEach(language => {
-        this.newWords.set(language, "");
-      });
-      this.words = await getWords();
+  beforeCreate() {
+    isSignedIn().then(async (isSignedIn) => {
+      this.preflightCheck = true;
+      if (isSignedIn) {
+        this.isSignedIn = true;
+      }
     });
+  },
+  created() {
   },
   mounted() {},
   methods: {
@@ -86,18 +95,31 @@ export default {
         }
       }
     },
+    buttonSignIn () {
+      gapi.auth2.getAuthInstance().signIn().then(() => {
+        console.log("User successfully signed in!");
+        this.isSignedIn = true;
+      });
+    }
   },
   watch: {
     words: {
       deep:true,
-    }
+    },
+    isSignedIn: async function () {
+      this.languages = await getLanguages();
+      this.languages.forEach(language => {
+        this.newWords.set(language, "");
+      });
+      this.words = await getWords();
+    },
   },
 };
 
 const spreadsheetId = '1CvbZsBsC-vqbqLyM8ov0B5O0SM-D3EB3zo6PJJYUpqs';
 const range = 'A1:Z';
 
-function handleClientLoad() {
+function isSignedIn() {
   return new Promise((resolve, reject) => {
     gapi.load("client:auth2", () => {
       const CLIENT_ID = "582485760308-aim00v0sor96v66bn2h4rgerqo1f1g74.apps.googleusercontent.com";
@@ -113,13 +135,9 @@ function handleClientLoad() {
           const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
           if (isSignedIn) {
             console.log("User already signed in!");
-            resolve("boi");
+            resolve(true);
           } else {
-            console.log("Requesting sign in...");
-            gapi.auth2.getAuthInstance().signIn().then(() => {
-              console.log("User successfully signed in!");
-              resolve("boi");
-            });
+            resolve(false);
           }
         },
         function (error) {
@@ -213,21 +231,24 @@ function deleteWord(rowIndex) {
   });
 }
 
-async function updateWord(word, languageIndex, rowIndex) {
-  const col = columnToLetter(languageIndex + 1);
-  const range = col + (rowIndex + 1);
-  const params = {
-    spreadsheetId: spreadsheetId,
-    range: range,
-    valueInputOption: "USER_ENTERED",
-  };
-  const valueRangeBody = {
-    range: range,
-    majorDimension: "ROWS",
-    values: [[word]],
-  };
-  await gapi.client.sheets.spreadsheets.values.update(params, valueRangeBody).then(function(response) {
-    console.log("Word updated!");
+function updateWord(word, languageIndex, rowIndex) {
+  return new Promise(async (resolve, reject) => {
+    const col = columnToLetter(languageIndex + 1);
+    const range = col + (rowIndex + 1);
+    const params = {
+      spreadsheetId: spreadsheetId,
+      range: range,
+      valueInputOption: "USER_ENTERED",
+    };
+    const valueRangeBody = {
+      range: range,
+      majorDimension: "ROWS",
+      values: [[word]],
+    };
+    await gapi.client.sheets.spreadsheets.values.update(params, valueRangeBody).then(function(response) {
+      console.log("Word updated!");
+      resolve("boi");
+    });
   });
 }
 

@@ -63,18 +63,35 @@ export default {
     isSignedIn: false,
   }),
   beforeCreate() {
-    isSignedIn().then(async (isSignedIn) => {
-      this.preflightCheck = true;
-      if (isSignedIn) {
-        this.isSignedIn = true;
-      }
-    });
   },
   created() {
+    this.preflightCheck = JSON.parse(localStorage.getItem("preflightCheck"));
+    this.isSignedIn = JSON.parse(localStorage.getItem("isSignedIn"));
+    if (this.preflightCheck) {
+      console.log("Loading from cache...");
+      this.loadData();
+      isSignedIn().then(async (isSignedIn) => {
+        if (isSignedIn) {
+          console.log("Refreshing words...");
+          await this.getData();
+        }
+      });
+    } else {
+      isSignedIn().then(async (isSignedIn) => {
+        this.preflightCheck = true;
+        if (isSignedIn) {
+          this.isSignedIn = true;
+        }
+      });
+    }
   },
-  mounted() {},
+  mounted() {
+  },
   methods: {
     buttonDeleteWord (rowIndex) {
+      console.log("showdown");
+      this.words.splice(rowIndex - 1, 1);
+      console.log(this.words);
       deleteWord(rowIndex).then(() => {
         setTimeout(getWords().then(words => {
           this.words = words;
@@ -96,22 +113,43 @@ export default {
       }
     },
     buttonSignIn () {
-      gapi.auth2.getAuthInstance().signIn().then(() => {
+      gapi.auth2.getAuthInstance().signIn().then(async () => {
         console.log("User successfully signed in!");
+        localStorage.setItem("preflightCheck", JSON.stringify(true));
+        localStorage.setItem("isSignedIn", JSON.stringify(true));
         this.isSignedIn = true;
+        await this.getData();
       });
-    }
-  },
-  watch: {
-    words: {
-      deep:true,
     },
-    isSignedIn: async function () {
+    async getData() {
       this.languages = await getLanguages();
       this.languages.forEach(language => {
         this.newWords.set(language, "");
       });
       this.words = await getWords();
+    },
+    loadData() {
+      this.words = JSON.parse(localStorage.getItem("words"));
+      this.languages = JSON.parse(localStorage.getItem("languages"));
+    },
+    storeData() {
+      localStorage.setItem("words", JSON.stringify(this.words));
+      localStorage.setItem("languages", JSON.stringify(this.languages));
+    }
+  },
+  watch: {
+    words: {
+      deep: true,
+      handler() {
+        console.log("changed!");
+        localStorage.setItem("words", JSON.stringify(this.words));
+      }
+    },
+    languages: {
+      deep: true,
+      handler() {
+        localStorage.setItem("languages", JSON.stringify(this.languages));
+      }
     },
   },
 };
@@ -218,7 +256,7 @@ function deleteWord(rowIndex) {
         deleteRange: {
           range: {
             startRowIndex: rowIndex,
-            endRowIndex: rowIndex+1,
+            endRowIndex: rowIndex + 1,
           },
           shiftDimension: "ROWS",
         }

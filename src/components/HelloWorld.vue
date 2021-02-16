@@ -61,6 +61,7 @@ export default {
     inputText: "",
     preflightCheck: false,
     isSignedIn: false,
+    sheetId: "",
   }),
   beforeCreate() {
   },
@@ -72,6 +73,7 @@ export default {
       this.loadData();
       isSignedIn().then(async (isSignedIn) => {
         if (isSignedIn) {
+          this.sheetId = await getSheet();
           console.log("Refreshing words...");
           await this.getData();
         }
@@ -89,11 +91,10 @@ export default {
   },
   methods: {
     buttonDeleteWord (rowIndex) {
-      console.log("showdown");
       this.words.splice(rowIndex - 1, 1);
       console.log(this.words);
-      deleteWord(rowIndex).then(() => {
-        setTimeout(getWords().then(words => {
+      deleteWord(rowIndex, this.sheetId).then(() => {
+        setTimeout(getWords(this.sheetId).then(words => {
           this.words = words;
         }), 500);
       });
@@ -102,8 +103,8 @@ export default {
       for (let language of this.languages) {
         const word = this.newWords[language];
         if (word) {
-          addWord(word, language).then(() => {
-            setTimeout(getWords().then(words => {
+          addWord(word, language, this.sheetId).then(() => {
+            setTimeout(getWords(this.sheetId).then(words => {
               this.words = words;
             }), 500);
             this.newWords[language] = "";
@@ -118,15 +119,16 @@ export default {
         localStorage.setItem("preflightCheck", JSON.stringify(true));
         localStorage.setItem("isSignedIn", JSON.stringify(true));
         this.isSignedIn = true;
+        this.sheetId = await getSheet();
         await this.getData();
       });
     },
     async getData() {
-      this.languages = await getLanguages();
+      this.languages = await getLanguages(this.sheetId);
       this.languages.forEach(language => {
         this.newWords.set(language, "");
       });
-      this.words = await getWords();
+      this.words = await getWords(this.sheetId);
     },
     loadData() {
       this.words = JSON.parse(localStorage.getItem("words"));
@@ -141,7 +143,6 @@ export default {
     words: {
       deep: true,
       handler() {
-        console.log("changed!");
         localStorage.setItem("words", JSON.stringify(this.words));
       }
     },
@@ -154,7 +155,6 @@ export default {
   },
 };
 
-const spreadsheetId = '1CvbZsBsC-vqbqLyM8ov0B5O0SM-D3EB3zo6PJJYUpqs';
 const range = 'A1:Z';
 
 function isSignedIn() {
@@ -162,8 +162,8 @@ function isSignedIn() {
     gapi.load("client:auth2", () => {
       const CLIENT_ID = "582485760308-aim00v0sor96v66bn2h4rgerqo1f1g74.apps.googleusercontent.com";
       const API_KEY = "AIzaSyBUANl-jEVX7FlqOIGr3hVYrH3WUwvLFtU";
-      const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",];
-      const SCOPES = "https://www.googleapis.com/auth/drive.file";
+      const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+      const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata";
       gapi.client.init({
         apiKey: API_KEY,
         clientId: CLIENT_ID,
@@ -186,7 +186,7 @@ function isSignedIn() {
   });
 }
 
-function getWords() {
+function getWords(spreadsheetId) {
   return new Promise(async (resolve, reject) => {
     await gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
@@ -215,10 +215,10 @@ function getWords() {
   });
 }
 
-function addWord(word, fromLanguage) {
+function addWord(word, fromLanguage, spreadsheetId) {
   return new Promise(async (resolve, reject) => {
     let fromLanguageIndex = -1;
-    const languages = await getLanguages();
+    const languages = await getLanguages(spreadsheetId);
     fromLanguageIndex = languages.indexOf(fromLanguage);
     let values = [];
     for (let col = 0; col < languages.length; col++) {
@@ -246,7 +246,7 @@ function addWord(word, fromLanguage) {
   });
 }
 
-function deleteWord(rowIndex) {
+function deleteWord(rowIndex, spreadsheetId) {
   return new Promise(async (resolve, reject) => {
     const params = {
       spreadsheetId: spreadsheetId,
@@ -290,7 +290,7 @@ function updateWord(word, languageIndex, rowIndex) {
   });
 }
 
-function getLanguages() {
+function getLanguages(spreadsheetId) {
   return new Promise((resolve, reject) => {
     gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
@@ -303,6 +303,27 @@ function getLanguages() {
   })
 }
 
+function setLanguages(languages, spreadsheetId) {
+  return new Promise(async (resolve, reject) => {
+    console.log(`Setting languages ${languages}!`);
+    const values = languages;
+    const params = {
+      spreadsheetId: spreadsheetId,
+      range: range,
+      valueInputOption: "USER_ENTERED",  
+    };
+    const valueRangeBody = {
+      range: "A1:Z",
+      majorDimension: "ROWS",
+      values: [values],
+    };
+    await gapi.client.sheets.spreadsheets.values.append(params, valueRangeBody).then(function(res) {
+      console.log("Languages set!");
+      resolve("boi");
+    });
+  });
+}
+
 function columnToLetter(column) {
   let temp, letter = "";
   while (column > 0) {
@@ -311,5 +332,101 @@ function columnToLetter(column) {
     column = (column - temp - 1) / 26;
   }
   return letter;
+}
+
+function getConfigFile() {
+  return new Promise(async (resolve, reject) => {
+    await gapi.client.drive.files.list({
+      spaces: 'appDataFolder',
+      fields: 'nextPageToken, files(id, name)',
+      pageSize: 100
+    }).then(function (res) {
+      if (res) {
+        if (res.result.files.length) {
+          resolve(res.result.files[0].id);
+        } else {
+          resolve(false);
+        }
+      }
+    });
+  });
+}
+
+function createConfigFile() {
+  return new Promise(async (resolve, reject) => {
+    const fileMetadata = {
+      'name': 'config.json',
+      'parents': ['appDataFolder'],
+    };
+    await gapi.client.drive.files.create({
+      resource: fileMetadata,
+      fields: 'id'
+    }).then(function (file) {
+      if (file) {
+        resolve(file.result.id);
+      }
+    });
+  });
+}
+
+function readConfigFile(fileId) {
+  return new Promise(async (resolve, reject) => {
+    await gapi.client.drive.files.get({
+      fileId: fileId,
+      alt: 'media'
+    }).then(function(res) {
+        resolve(res.body);
+    });
+  });
+}
+
+function writeConfigFile(fileId, sheetId) {
+  return new Promise(async (resolve, reject) => {
+    await gapi.client.request({
+      path: '/upload/drive/v3/files/' + fileId,
+      method: 'PATCH',
+      params: {
+        uploadType: 'media'
+      },
+      body: JSON.stringify({"sheetId": sheetId})
+    }).then(function (res) {
+      resolve(true);
+    });
+  });
+}
+
+function createSheet() {
+  return new Promise(async (resolve, reject) => {
+    const resource = {
+      properties: {
+        title: "oyster_dictionary",
+      },
+    };
+    await gapi.client.sheets.spreadsheets.create({
+      resource,
+      fields: 'spreadsheetId',
+    }).then(function (spreadsheet) {
+      if (spreadsheet) {
+        resolve(spreadsheet.result.spreadsheetId);
+      }
+    });
+  });
+}
+
+async function getSheet () {
+  const fileId = await getConfigFile();
+  if (!fileId) {
+    console.log("No config file, creating config file and spreadsheet.");
+    const [fileId, sheetId] = await Promise.all([createConfigFile(), createSheet()]);
+    console.log("Writing sheet ID to config file.");
+    const languages = ["en", "de", "ru"];
+    await Promise.all([writeConfigFile(fileId, sheetId), setLanguages(languages, sheetId)]);
+    return sheetId;
+  } else {
+    console.log("Config file already exists.");
+    const content = await readConfigFile(fileId);
+    const sheetId = JSON.parse(content).sheetId;
+    return sheetId;
+  }
 }
 </script>

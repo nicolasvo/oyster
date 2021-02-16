@@ -223,7 +223,7 @@ function addWord(word, fromLanguage, spreadsheetId) {
     let values = [];
     for (let col = 0; col < languages.length; col++) {
       if (col !== fromLanguageIndex) {
-        values.push(`=GOOGLETRANSLATE("${word}", "${fromLanguage}", "${languages[col]}")`);
+        values.push(`=GOOGLETRANSLATE("${word}";"${fromLanguage}";"${languages[col]}")`);
       } else {
         values.push(word);
       }

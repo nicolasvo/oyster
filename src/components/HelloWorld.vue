@@ -44,6 +44,20 @@
           </div>
         </form>
       </div>
+      <div class="flex justify-center">
+        <form v-on:submit.prevent="buttonSelectLanguages">
+          <div v-for="language in availableLanguages" :key="language">
+            <input type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
+            <span class="ml-2 text-gray-700">{{ language.name }}</span>
+          </div>
+          <p>{{ selectedLanguages }}</p>
+          <div class="flex justify-center">
+            <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+              Select language
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -62,6 +76,67 @@ export default {
     preflightCheck: false,
     isSignedIn: false,
     sheetId: "",
+    selectedLanguages: [],
+    availableLanguages: [
+      { code: "af", name: "Afrikaans" },
+      { code: "sq", name: "Albanian" },
+      { code: "ar", name: "Arabic" },
+      { code: "hy", name: "Armenian" },
+      { code: "az", name: "Azerbaijani" },
+      { code: "eu", name: "Basque" },
+      { code: "be", name: "Belarusian" },
+      { code: "bg", name: "Bulgarian" },
+      { code: "ca", name: "Catalan" },
+      // { code: "zh-CN", name: "Chinese (Simplified)" },
+      // { code: "zh-TW", name: "Chinese (Traditional)" },
+      // { code: "hr", name: "Croatian" },
+      // { code: "cs", name: "Czech" },
+      // { code: "da", name: "Danish" },
+      // { code: "nl", name: "Dutch" },
+      // { code: "en", name: "English" },
+      // { code: "et", name: "Estonian" },
+      // { code: "tl", name: "Filipino" },
+      // { code: "fi", name: "Finnish" },
+      // { code: "fr", name: "French" },
+      // { code: "gl", name: "Galician" },
+      // { code: "ka", name: "Georgian" },
+      // { code: "de", name: "German" },
+      // { code: "el", name: "Greek" },
+      // { code: "ht", name: "Haitian Creole" },
+      // { code: "iw", name: "Hebrew" },
+      // { code: "hi", name: "Hindi" },
+      // { code: "hu", name: "Hungarian" },
+      // { code: "is", name: "Icelandic" },
+      // { code: "id", name: "Indonesian" },
+      // { code: "ga", name: "Irish" },
+      // { code: "it", name: "Italian" },
+      // { code: "ja", name: "Japanese" },
+      // { code: "ko", name: "Korean" },
+      // { code: "lv", name: "Latvian" },
+      // { code: "lt", name: "Lithuanian" },
+      // { code: "mk", name: "Macedonian" },
+      // { code: "ms", name: "Malay" },
+      // { code: "mt", name: "Maltese" },
+      // { code: "no", name: "Norwegian" },
+      // { code: "fa", name: "Persian" },
+      // { code: "pl", name: "Polish" },
+      // { code: "pt", name: "Portuguese" },
+      // { code: "ro", name: "Romanian" },
+      // { code: "ru", name: "Russian" },
+      // { code: "sr", name: "Serbian" },
+      // { code: "sk", name: "Slovak" },
+      // { code: "sl", name: "Slovenian" },
+      // { code: "es", name: "Spanish" },
+      // { code: "sw", name: "Swahili" },
+      // { code: "sv", name: "Swedish" },
+      // { code: "th", name: "Thai" },
+      // { code: "tr", name: "Turkish" },
+      // { code: "uk", name: "Ukrainian" },
+      // { code: "ur", name: "Urdu" },
+      // { code: "vi", name: "Vietnamese" },
+      // { code: "cy", name: "Welsh" },
+      // { code: "yi", name: "Yiddish" },
+    ]
   }),
   beforeCreate() {
   },
@@ -112,6 +187,11 @@ export default {
           break;
         }
       }
+    },
+    buttonSelectLanguages () {
+      // TODO: call function to write languages to config file
+      console.log("faith +1");
+      console.log(this.selectedLanguages);
     },
     buttonSignIn () {
       gapi.auth2.getAuthInstance().signIn().then(async () => {
@@ -389,7 +469,7 @@ function writeConfigFile(fileId, sheetId) {
         uploadType: 'media'
       },
       body: JSON.stringify({"sheetId": sheetId})
-    }).then(function (res) {
+    }).then(() => {
       resolve(true);
     });
   });

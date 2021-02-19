@@ -10,6 +10,8 @@ module.exports = {
   variants: {
     extend: {
       tableLayout: ['hover', 'focus'],
+      backgroundColor: ['checked'],
+      borderColor: ['checked'],
     },
   },
   plugins: [

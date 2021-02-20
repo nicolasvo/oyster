@@ -199,8 +199,18 @@ export default {
     async buttonSelectLanguages () {
       this.showLanguages = false;
       console.log(this.selectedLanguages);
-      this.languages = this.selectedLanguages;
-      await clearLanguages(this.sheetId);
+      const oldLanguages = this.languages.filter(x => !this.selectedLanguages.includes(x));
+      const newLanguages = this.selectedLanguages.filter(x => !this.languages.includes(x));
+      const sameLanguages = this.languages.filter(x => this.selectedLanguages.includes(x));
+      console.log(`old languages: ${oldLanguages}`); 
+      console.log(`new languages: ${newLanguages}`);
+      const promises = [];
+      oldLanguages.forEach(language => {
+        const promise = deleteLanguage(this.languages.indexOf(language), this.sheetId);
+        promises.push(promise);
+      });
+      await Promise.all(promises);
+      this.languages = sameLanguages.concat(newLanguages);
       setLanguages(this.selectedLanguages, this.sheetId);
     },
     buttonSignIn () {
@@ -367,6 +377,29 @@ function deleteWord(rowIndex, spreadsheetId) {
     };
     await gapi.client.sheets.spreadsheets.batchUpdate(params, requestBody).then(function(response) {
       console.log("Word deleted!");
+      resolve("boi");
+    });
+  });
+}
+
+function deleteLanguage(columnIndex, spreadsheetId) {
+  return new Promise(async (resolve, reject) => {
+    const params = {
+      spreadsheetId: spreadsheetId,
+    };
+    const requestBody = {
+      requests: [{
+        deleteRange: {
+          range: {
+            startColumnIndex: columnIndex,
+            endColumnIndex: columnIndex + 1,
+          },
+          shiftDimension: "COLUMNS",
+        }
+      }]
+    };
+    await gapi.client.sheets.spreadsheets.batchUpdate(params, requestBody).then(function(response) {
+      console.log("Language deleted!");
       resolve("boi");
     });
   });

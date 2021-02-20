@@ -7,54 +7,60 @@
       </button>
     </div>
     <div v-else class="container flex flex-col space-y-4 justify-center">
-      <div class="mt-5 flex justify-center">
-        <table class="table-fixed">
-          <thead>
-            <tr>
-              <th v-for="language in languages" :key="language" class="w-3/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
-                {{ language }}
-              </th>
-              <th class="w-1/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
-              <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
-                {{ word[language] }}
-              </td>
-              <td class="py-2 px-6 border-b border-grey-light">
-                <button v-on:click="buttonDeleteWord(index + 1)">
-                  <svg class="object-scale-down h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div v-show="languages.length">
+        <div class="mt-5 flex justify-center">
+          <table class="table-fixed">
+            <thead>
+              <tr>
+                <th v-for="language in languages" :key="language" class="w-3/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                  {{ language }}
+                </th>
+                <th class="w-1/10 py-2 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
+                <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
+                  {{ word[language] }}
+                </td>
+                <td class="py-2 px-6 border-b border-grey-light">
+                  <button v-on:click="buttonDeleteWord(index + 1)">
+                    <svg class="object-scale-down h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="flex justify-center">
+          <form v-on:submit.prevent="buttonAddWord">
+            <div v-for="language in languages" :key="language">
+              <span class="text-gray-700">{{ language }}</span>
+              <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
+            </div>
+            <div class="flex justify-center">
+              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+                Add word
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
       <div class="flex justify-center">
-        <form v-on:submit.prevent="buttonAddWord">
-          <div v-for="language in languages" :key="language">
-            <span class="text-gray-700">{{ language }}</span>
-            <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
-          </div>
-          <div class="flex justify-center">
-            <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
-              Add word
-            </button>
-          </div>
-        </form>
-      </div>
-      <div class="flex justify-center">
+        <button @click="showLanguages = !showLanguages" class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none">
+          {{ buttonShowLanguageText }}
+        </button>
+      </div>   
+      <div v-show="showLanguages" class="flex justify-center">
         <form v-on:submit.prevent="buttonSelectLanguages">
-          <div v-for="language in availableLanguages" :key="language">
-            <input type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
-            <span class="ml-2 text-gray-700">{{ language.name }}</span>
-          </div>
-          <p>{{ selectedLanguages }}</p>
           <div class="flex justify-center">
             <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
-              Select language
+              Select languages
             </button>
+          </div>
+          <div v-for="language in availableLanguages" :key="language">
+            <input class="checked:bg-green-600" type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
+            <span class="ml-2 text-gray-700">{{ language.name }}</span>
           </div>
         </form>
       </div>
@@ -76,6 +82,8 @@ export default {
     preflightCheck: false,
     isSignedIn: false,
     sheetId: "",
+    showLanguages: false,
+    buttonShowLanguageText: "Show languages",
     selectedLanguages: [],
     availableLanguages: [
       { code: "af", name: "Afrikaans" },
@@ -87,55 +95,55 @@ export default {
       { code: "be", name: "Belarusian" },
       { code: "bg", name: "Bulgarian" },
       { code: "ca", name: "Catalan" },
-      // { code: "zh-CN", name: "Chinese (Simplified)" },
-      // { code: "zh-TW", name: "Chinese (Traditional)" },
-      // { code: "hr", name: "Croatian" },
-      // { code: "cs", name: "Czech" },
-      // { code: "da", name: "Danish" },
-      // { code: "nl", name: "Dutch" },
-      // { code: "en", name: "English" },
-      // { code: "et", name: "Estonian" },
-      // { code: "tl", name: "Filipino" },
-      // { code: "fi", name: "Finnish" },
-      // { code: "fr", name: "French" },
-      // { code: "gl", name: "Galician" },
-      // { code: "ka", name: "Georgian" },
-      // { code: "de", name: "German" },
-      // { code: "el", name: "Greek" },
-      // { code: "ht", name: "Haitian Creole" },
-      // { code: "iw", name: "Hebrew" },
-      // { code: "hi", name: "Hindi" },
-      // { code: "hu", name: "Hungarian" },
-      // { code: "is", name: "Icelandic" },
-      // { code: "id", name: "Indonesian" },
-      // { code: "ga", name: "Irish" },
-      // { code: "it", name: "Italian" },
-      // { code: "ja", name: "Japanese" },
-      // { code: "ko", name: "Korean" },
-      // { code: "lv", name: "Latvian" },
-      // { code: "lt", name: "Lithuanian" },
-      // { code: "mk", name: "Macedonian" },
-      // { code: "ms", name: "Malay" },
-      // { code: "mt", name: "Maltese" },
-      // { code: "no", name: "Norwegian" },
-      // { code: "fa", name: "Persian" },
-      // { code: "pl", name: "Polish" },
-      // { code: "pt", name: "Portuguese" },
-      // { code: "ro", name: "Romanian" },
-      // { code: "ru", name: "Russian" },
-      // { code: "sr", name: "Serbian" },
-      // { code: "sk", name: "Slovak" },
-      // { code: "sl", name: "Slovenian" },
-      // { code: "es", name: "Spanish" },
-      // { code: "sw", name: "Swahili" },
-      // { code: "sv", name: "Swedish" },
-      // { code: "th", name: "Thai" },
-      // { code: "tr", name: "Turkish" },
-      // { code: "uk", name: "Ukrainian" },
-      // { code: "ur", name: "Urdu" },
-      // { code: "vi", name: "Vietnamese" },
-      // { code: "cy", name: "Welsh" },
-      // { code: "yi", name: "Yiddish" },
+      { code: "zh-CN", name: "Chinese (Simplified)" },
+      { code: "zh-TW", name: "Chinese (Traditional)" },
+      { code: "hr", name: "Croatian" },
+      { code: "cs", name: "Czech" },
+      { code: "da", name: "Danish" },
+      { code: "nl", name: "Dutch" },
+      { code: "en", name: "English" },
+      { code: "et", name: "Estonian" },
+      { code: "tl", name: "Filipino" },
+      { code: "fi", name: "Finnish" },
+      { code: "fr", name: "French" },
+      { code: "gl", name: "Galician" },
+      { code: "ka", name: "Georgian" },
+      { code: "de", name: "German" },
+      { code: "el", name: "Greek" },
+      { code: "ht", name: "Haitian Creole" },
+      { code: "iw", name: "Hebrew" },
+      { code: "hi", name: "Hindi" },
+      { code: "hu", name: "Hungarian" },
+      { code: "is", name: "Icelandic" },
+      { code: "id", name: "Indonesian" },
+      { code: "ga", name: "Irish" },
+      { code: "it", name: "Italian" },
+      { code: "ja", name: "Japanese" },
+      { code: "ko", name: "Korean" },
+      { code: "lv", name: "Latvian" },
+      { code: "lt", name: "Lithuanian" },
+      { code: "mk", name: "Macedonian" },
+      { code: "ms", name: "Malay" },
+      { code: "mt", name: "Maltese" },
+      { code: "no", name: "Norwegian" },
+      { code: "fa", name: "Persian" },
+      { code: "pl", name: "Polish" },
+      { code: "pt", name: "Portuguese" },
+      { code: "ro", name: "Romanian" },
+      { code: "ru", name: "Russian" },
+      { code: "sr", name: "Serbian" },
+      { code: "sk", name: "Slovak" },
+      { code: "sl", name: "Slovenian" },
+      { code: "es", name: "Spanish" },
+      { code: "sw", name: "Swahili" },
+      { code: "sv", name: "Swedish" },
+      { code: "th", name: "Thai" },
+      { code: "tr", name: "Turkish" },
+      { code: "uk", name: "Ukrainian" },
+      { code: "ur", name: "Urdu" },
+      { code: "vi", name: "Vietnamese" },
+      { code: "cy", name: "Welsh" },
+      { code: "yi", name: "Yiddish" },
     ]
   }),
   beforeCreate() {
@@ -188,10 +196,12 @@ export default {
         }
       }
     },
-    buttonSelectLanguages () {
+    async buttonSelectLanguages () {
       // TODO: call function to write languages to config file
-      console.log("faith +1");
       console.log(this.selectedLanguages);
+      this.languages = this.selectedLanguages;
+      await clearLanguages(this.sheetId);
+      setLanguages(this.selectedLanguages, this.sheetId);
     },
     buttonSignIn () {
       gapi.auth2.getAuthInstance().signIn().then(async () => {
@@ -208,7 +218,9 @@ export default {
       this.languages.forEach(language => {
         this.newWords.set(language, "");
       });
-      this.words = await getWords(this.sheetId);
+      if (this.languages.length) {
+        this.words = await getWords(this.sheetId);
+      }
     },
     loadData() {
       this.words = JSON.parse(localStorage.getItem("words"));
@@ -232,6 +244,16 @@ export default {
         localStorage.setItem("languages", JSON.stringify(this.languages));
       }
     },
+    showLanguages: {
+      handler() {
+        if (this.showLanguages) {
+          this.buttonShowLanguageText = "Hide languages"
+        }
+        else {
+          this.buttonShowLanguageText = "Show languages"
+        }
+      }
+    }
   },
 };
 
@@ -379,26 +401,42 @@ function getLanguages(spreadsheetId) {
       const range = response.result;
       const languages = range.values[0];
       resolve(languages);
+    }).catch(function(err) {
+      resolve([]);
     });
   })
 }
 
 function setLanguages(languages, spreadsheetId) {
   return new Promise(async (resolve, reject) => {
-    console.log(`Setting languages ${languages}!`);
     const values = languages;
+    const range = "A1:Z1";
     const params = {
       spreadsheetId: spreadsheetId,
       range: range,
       valueInputOption: "USER_ENTERED",  
     };
     const valueRangeBody = {
-      range: "A1:Z",
+      range: range,
       majorDimension: "ROWS",
       values: [values],
     };
-    await gapi.client.sheets.spreadsheets.values.append(params, valueRangeBody).then(function(res) {
+    await gapi.client.sheets.spreadsheets.values.update(params, valueRangeBody).then(function(response) {
       console.log("Languages set!");
+      resolve("boi");
+    });
+  });
+}
+
+function clearLanguages(spreadsheetId) {
+  return new Promise(async (resolve, reject) => {
+    const range = "A1:Z1"
+    const params = {
+      spreadsheetId: spreadsheetId,
+      range: range,
+    };
+    await gapi.client.sheets.spreadsheets.values.clear(params).then(function(response) {
+      console.log("Languages cleared!");
       resolve("boi");
     });
   });
@@ -460,7 +498,7 @@ function readConfigFile(fileId) {
   });
 }
 
-function writeConfigFile(fileId, sheetId) {
+function writeConfigFile(fileId, sheetId, content) {
   return new Promise(async (resolve, reject) => {
     await gapi.client.request({
       path: '/upload/drive/v3/files/' + fileId,
@@ -468,7 +506,7 @@ function writeConfigFile(fileId, sheetId) {
       params: {
         uploadType: 'media'
       },
-      body: JSON.stringify({"sheetId": sheetId})
+      body: JSON.stringify(content)
     }).then(() => {
       resolve(true);
     });
@@ -499,8 +537,9 @@ async function getSheet () {
     console.log("No config file, creating config file and spreadsheet.");
     const [fileId, sheetId] = await Promise.all([createConfigFile(), createSheet()]);
     console.log("Writing sheet ID to config file.");
-    const languages = ["en", "de", "ru"];
-    await Promise.all([writeConfigFile(fileId, sheetId), setLanguages(languages, sheetId)]);
+    // const languages = ["en", "de", "ru"];
+    // await Promise.all([writeConfigFile(fileId, sheetId, {"sheetId": sheetId, "languages": []}), setLanguages(languages, sheetId)]);
+    await writeConfigFile(fileId, sheetId, {"sheetId": sheetId});
     return sheetId;
   } else {
     console.log("Config file already exists.");

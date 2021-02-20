@@ -197,7 +197,7 @@ export default {
       }
     },
     async buttonSelectLanguages () {
-      // TODO: call function to write languages to config file
+      this.showLanguages = false;
       console.log(this.selectedLanguages);
       this.languages = this.selectedLanguages;
       await clearLanguages(this.sheetId);
@@ -242,6 +242,7 @@ export default {
       deep: true,
       handler() {
         localStorage.setItem("languages", JSON.stringify(this.languages));
+        this.selectedLanguages = this.languages;
       }
     },
     showLanguages: {

@@ -6,7 +6,7 @@
         Sign in 
       </button>
     </div>
-    <div v-else class="container flex flex-col space-y-4 justify-center">
+    <div v-else class="container flex flex-col space-y-4 justify-center mb-2">
       <div v-show="languages.length">
         <div class="mt-5 flex justify-center">
           <table class="table-fixed">
@@ -32,7 +32,7 @@
             </tbody>
           </table>
         </div>
-        <div class="flex justify-center">
+        <div class="flex justify-center mt-5">
           <form v-on:submit.prevent="buttonAddWord">
             <div v-for="language in languages" :key="language">
               <span class="text-gray-700">{{ language }}</span>
@@ -59,7 +59,7 @@
             </button>
           </div>
           <div v-for="language in availableLanguages" :key="language">
-            <input class="checked:bg-green-600" type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
+            <input class="rounded text-green-500 checked:bg-green-600 my-2" type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
             <span class="ml-2 text-gray-700">{{ language.name }}</span>
           </div>
         </form>

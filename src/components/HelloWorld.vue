@@ -202,16 +202,16 @@ export default {
       const oldLanguages = this.languages.filter(x => !this.selectedLanguages.includes(x));
       const newLanguages = this.selectedLanguages.filter(x => !this.languages.includes(x));
       const sameLanguages = this.languages.filter(x => this.selectedLanguages.includes(x));
+      const tempLanguages = this.languages;
       console.log(`old languages: ${oldLanguages}`); 
       console.log(`new languages: ${newLanguages}`);
-      const promises = [];
-      oldLanguages.forEach(language => {
-        const promise = deleteLanguage(this.languages.indexOf(language), this.sheetId);
-        promises.push(promise);
+      oldLanguages.forEach(async(language) => {
+        const languageIndex = tempLanguages.indexOf(language);
+        tempLanguages.splice(languageIndex, 1);
+        await deleteLanguage(languageIndex, this.sheetId);
       });
-      await Promise.all(promises);
-      this.languages = sameLanguages.concat(newLanguages);
-      setLanguages(this.selectedLanguages, this.sheetId);
+      this.selectedLanguages = sameLanguages.concat(newLanguages);
+      await setLanguages(this.selectedLanguages, this.sheetId).then(this.languages = this.selectedLanguages);
     },
     buttonSignIn () {
       gapi.auth2.getAuthInstance().signIn().then(async () => {

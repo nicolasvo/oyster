@@ -571,8 +571,6 @@ async function getSheet () {
     console.log("No config file, creating config file and spreadsheet.");
     const [fileId, sheetId] = await Promise.all([createConfigFile(), createSheet()]);
     console.log("Writing sheet ID to config file.");
-    // const languages = ["en", "de", "ru"];
-    // await Promise.all([writeConfigFile(fileId, sheetId, {"sheetId": sheetId, "languages": []}), setLanguages(languages, sheetId)]);
     await writeConfigFile(fileId, sheetId, {"sheetId": sheetId});
     return sheetId;
   } else {

@@ -48,7 +48,7 @@
               <input class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:border-green-400 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50" type="text" v-model="newWords[language]" :placeholder="inputText">
             </div>
             <div class="flex justify-center">
-              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonAddWord(); toggleModal('word')">
+              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonAddWord(); toggleModal('word');">
                 Add word
               </button> 
             </div>
@@ -65,7 +65,7 @@
           Select languages
         </button>
       </div>
-      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50 h-screen items-center">
+      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50">
         <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4">
           <p>select languages</p>
           <br>
@@ -75,7 +75,7 @@
               <span class="ml-2 text-gray-700">{{ language.name }}</span>
             </div>
             <div class="flex justify-center">
-              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonSelectLanguages()">
+              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonSelectLanguages(); toggleModal('language');">
                 Select languages
               </button>
             </div>

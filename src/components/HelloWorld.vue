@@ -32,39 +32,64 @@
             </tbody>
           </table>
         </div>
-        <div class="flex justify-center mt-5">
-          <form v-on:submit.prevent="buttonAddWord">
+      </div>
+      <div class="flex justify-center">
+        <button class="mt-4 mb-2 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('word')">
+          Add word
+        </button>
+      </div>
+      <div v-if="showModalWord" class="flex justify-center fixed inline-block align-middle inset-0 z-50 h-screen items-center">
+        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto">
+          <p>new word</p> 
+          <br>
+          <form v-on:submit.prevent>
             <div v-for="language in languages" :key="language">
               <span class="text-gray-700">{{ language }}</span>
-              <input class="mt-0 block py-0.1 px-0.5 border-0 border-b-2 border-gray-200 focus:ring-0 focus:border-green-500" type="text" v-model="newWords[language]" :placeholder="inputText">
+              <input class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:border-green-400 focus:ring-2 focus:ring-green-400 focus:ring-opacity-50" type="text" v-model="newWords[language]" :placeholder="inputText">
             </div>
             <div class="flex justify-center">
-              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
+              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonAddWord(); toggleModal('word')">
                 Add word
+              </button> 
+            </div>
+            <div class="flex justify-center">
+              <button class="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('word')">
+                Close
               </button>
             </div>
           </form>
         </div>
       </div>
       <div class="flex justify-center">
-        <button @click="showLanguages = !showLanguages" class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none">
-          {{ buttonShowLanguageText }}
+        <button class="my-2 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('language')">
+          Select languages
         </button>
-      </div>   
-      <div v-show="showLanguages" class="flex justify-center">
-        <form v-on:submit.prevent="buttonSelectLanguages">
-          <div class="flex justify-center">
-            <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit">
-              Select languages
-            </button>
-          </div>
-          <div v-for="language in availableLanguages" :key="language">
-            <input class="rounded text-green-500 checked:bg-green-600 my-2" type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
-            <span class="ml-2 text-gray-700">{{ language.name }}</span>
-          </div>
-        </form>
+      </div>
+      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50 h-screen items-center">
+        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4">
+          <p>select languages</p>
+          <br>
+          <form v-on:submit.prevent>
+            <div v-for="language in availableLanguages" :key="language">
+              <input class="rounded text-green-500 checked:bg-green-600 my-2" type="checkbox" v-model="selectedLanguages" :value="language.code" :id="language.code">
+              <span class="ml-2 text-gray-700">{{ language.name }}</span>
+            </div>
+            <div class="flex justify-center">
+              <button class="my-5 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" type="submit" v-on:click="buttonSelectLanguages()">
+                Select languages
+              </button>
+            </div>
+            <div class="flex justify-center">
+              <button class="mb-6 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('language')">
+                Close
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
+    <div v-if="showModalWord" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
+    <div v-if="showModalLanguage" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
   </div>
 </template>
 
@@ -75,6 +100,8 @@ export default {
     msg: String,
   },
   data: () => ({
+    showModalWord: false,
+    showModalLanguage: false,
     words: [],
     languages: [],
     newWords: new Map(),
@@ -173,6 +200,14 @@ export default {
   mounted() {
   },
   methods: {
+    toggleModal: function(key) {
+      if (key == "word") {
+        this.showModalWord = !this.showModalWord;
+      }
+      else if (key == "language") {
+        this.showModalLanguage = !this.showModalLanguage;
+      }
+    },
     buttonDeleteWord (rowIndex) {
       this.words.splice(rowIndex - 1, 1);
       console.log(this.words);

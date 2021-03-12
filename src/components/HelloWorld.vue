@@ -38,7 +38,7 @@
           Add word
         </button>
       </div>
-      <div v-if="showModalWord" class="flex justify-center fixed inline-block align-middle inset-0 z-50 h-screen items-center">
+      <div v-if="showModalWord" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
         <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto">
           <p>new word</p> 
           <br>
@@ -65,7 +65,7 @@
           Select languages
         </button>
       </div>
-      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50">
+      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
         <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4">
           <p>select languages</p>
           <br>

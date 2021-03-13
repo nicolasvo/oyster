@@ -20,7 +20,7 @@
             </thead>
             <tbody>
               <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
-                <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light">
+                <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light break-words"> 
                   {{ word[language] }}
                 </td>
                 <td class="py-2 px-6 border-b border-grey-light">
@@ -33,7 +33,7 @@
           </table>
         </div>
       </div>
-      <div class="flex justify-center">
+      <div v-show="languages.length" class="flex justify-center">
         <button class="mt-4 mb-2 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('word')">
           Add word
         </button>
@@ -80,7 +80,7 @@
               </button>
             </div>
             <div class="flex justify-center">
-              <button class="mb-6 py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('language')">
+              <button class="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none" v-on:click="toggleModal('language')">
                 Close
               </button>
             </div>
@@ -100,8 +100,6 @@ export default {
     msg: String,
   },
   data: () => ({
-    showModalWord: false,
-    showModalLanguage: false,
     words: [],
     languages: [],
     newWords: new Map(),
@@ -109,7 +107,8 @@ export default {
     preflightCheck: false,
     isSignedIn: false,
     sheetId: "",
-    showLanguages: false,
+    showModalWord: false,
+    showModalLanguage: false,
     buttonShowLanguageText: "Show languages",
     selectedLanguages: [],
     availableLanguages: [
@@ -232,7 +231,6 @@ export default {
       }
     },
     async buttonSelectLanguages () {
-      this.showLanguages = false;
       console.log(this.selectedLanguages);
       const oldLanguages = this.languages.filter(x => !this.selectedLanguages.includes(x));
       const newLanguages = this.selectedLanguages.filter(x => !this.languages.includes(x));
@@ -290,16 +288,6 @@ export default {
         this.selectedLanguages = this.languages;
       }
     },
-    showLanguages: {
-      handler() {
-        if (this.showLanguages) {
-          this.buttonShowLanguageText = "Hide languages"
-        }
-        else {
-          this.buttonShowLanguageText = "Show languages"
-        }
-      }
-    }
   },
 };
 

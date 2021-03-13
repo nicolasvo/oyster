@@ -20,7 +20,7 @@
             </thead>
             <tbody>
               <tr v-for="(word, index) in words" :key="word" class="hover:bg-grey-lighter">
-                <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light break-words"> 
+                <td v-for="language in languages" :key="language" class="text-center py-2 px-6 border-b border-grey-light break-words">
                   {{ word[language] }}
                 </td>
                 <td class="py-2 px-6 border-b border-grey-light">
@@ -40,7 +40,13 @@
       </div>
       <div v-if="showModalWord" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
         <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto">
-          <p>new word</p> 
+          <div>
+            <p class="float-left">new word</p> 
+            <button v-on:click="toggleModal('word')" class="float-right">
+              <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"/><path d="M19.5,6c-1.31,0-2.37,1.01-2.48,2.3C15.14,7.8,14.18,6.5,12,6.5c-2.19,0-3.14,1.3-5.02,1.8C6.87,7.02,5.81,6,4.5,6 C3.12,6,2,7.12,2,8.5V9c0,6,3.6,7.81,6.52,7.98C9.53,17.62,10.72,18,12,18s2.47-0.38,3.48-1.02C18.4,16.81,22,15,22,9V8.5 C22,7.12,20.88,6,19.5,6z M3.5,9V8.5c0-0.55,0.45-1,1-1s1,0.45,1,1v3c0,1.28,0.38,2.47,1.01,3.48C4.99,14.27,3.5,12.65,3.5,9z M14.3,11.01c-0.4-0.17-0.72-0.36-1.01-0.53C12.83,10.2,12.49,10,12,10c-0.49,0-0.84,0.2-1.31,0.48c-0.28,0.17-0.6,0.35-0.98,0.51 C9.37,11.14,9,10.91,9,10.54v0c0-0.2,0.11-0.38,0.29-0.45c0.34-0.14,0.62-0.31,0.88-0.46C10.72,9.3,11.23,9,12,9s1.27,0.3,1.8,0.62 c0.27,0.16,0.55,0.33,0.9,0.48c0.18,0.08,0.29,0.26,0.29,0.45C15,10.91,14.63,11.15,14.3,11.01z M20.5,9c0,3.65-1.49,5.27-3.01,5.98 c0.64-1.01,1.01-2.2,1.01-3.48v-3c0-0.55,0.45-1,1-1s1,0.45,1,1V9z"/></svg>
+            </button>
+          </div>
+          <br>
           <br>
           <form v-on:submit.prevent>
             <div v-for="language in languages" :key="language">
@@ -67,7 +73,13 @@
       </div>
       <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
         <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4">
-          <p>select languages</p>
+          <div>
+            <p class="float-left">select languages</p> 
+            <button v-on:click="toggleModal('language')" class="float-right">
+              <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24" y="0"/><path d="M17.5,9c0.83,0,1.5,0.67,1.5,1.5S18.33,12,17.5,12S16,11.33,16,10.5S16.67,9,17.5,9z M10.83,8H20v8h-1.17l1.87,1.87 C21.45,17.58,22,16.85,22,16V8c0-1.1-0.9-2-2-2H8.83L10.83,8z M19.78,22.61L15.17,18H4c-1.1,0-2-0.9-2-2V8 c0-0.85,0.55-1.58,1.3-1.87L1.39,4.22l1.41-1.41l18.38,18.38L19.78,22.61z M13.17,16l-3-3H9v2H7v-2H5v-2h2V9.83L5.17,8H4v8H13.17z"/></svg>
+            </button>
+          </div>
+          <br>
           <br>
           <form v-on:submit.prevent>
             <div v-for="language in availableLanguages" :key="language">
@@ -231,20 +243,26 @@ export default {
       }
     },
     async buttonSelectLanguages () {
-      console.log(this.selectedLanguages);
+      console.log(`selected languages: ${this.selectedLanguages}`);
       const oldLanguages = this.languages.filter(x => !this.selectedLanguages.includes(x));
       const newLanguages = this.selectedLanguages.filter(x => !this.languages.includes(x));
       const sameLanguages = this.languages.filter(x => this.selectedLanguages.includes(x));
       const tempLanguages = this.languages;
       console.log(`old languages: ${oldLanguages}`); 
       console.log(`new languages: ${newLanguages}`);
-      oldLanguages.forEach(async(language) => {
-        const languageIndex = tempLanguages.indexOf(language);
-        tempLanguages.splice(languageIndex, 1);
-        await deleteLanguage(languageIndex, this.sheetId);
-      });
+      console.log(`same languages: ${sameLanguages}`);
       this.selectedLanguages = sameLanguages.concat(newLanguages);
-      await setLanguages(this.selectedLanguages, this.sheetId).then(this.languages = this.selectedLanguages);
+      oldLanguages.reverse().forEach(async (language, index) => {
+        const languageIndex = tempLanguages.indexOf(language);
+        console.log(`language to delete: ${language} and ${languageIndex}`);
+        await deleteLanguage(languageIndex, this.sheetId).then(() => {
+          console.log(`hehe bye ${language}`)
+        });
+        // tempLanguages.splice(languageIndex, 1);
+      });
+      await setLanguages(this.selectedLanguages, this.sheetId).then(() => {
+        this.languages = this.selectedLanguages;
+      });
     },
     buttonSignIn () {
       gapi.auth2.getAuthInstance().signIn().then(async () => {
@@ -411,19 +429,21 @@ function deleteLanguage(columnIndex, spreadsheetId) {
       spreadsheetId: spreadsheetId,
     };
     const requestBody = {
-      requests: [{
-        deleteRange: {
-          range: {
-            startColumnIndex: columnIndex,
-            endColumnIndex: columnIndex + 1,
-          },
-          shiftDimension: "COLUMNS",
-        }
-      }]
+      requests: [
+        {
+          deleteRange: {
+            range: {
+              startColumnIndex: columnIndex,
+              endColumnIndex: columnIndex + 1,
+            },
+            shiftDimension: "COLUMNS",
+          }
+        },
+      ]
     };
     await gapi.client.sheets.spreadsheets.batchUpdate(params, requestBody).then(function(response) {
       console.log("Language deleted!");
-      resolve("boi");
+      resolve(true);
     });
   });
 }

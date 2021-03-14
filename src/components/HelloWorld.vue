@@ -38,8 +38,8 @@
           Add word
         </button>
       </div>
-      <div v-if="showModalWord" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
-        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto">
+      <div v-if="showModalWord" class="flex justify-center fixed inset-0 z-50 items-center" v-on:click.self="toggleModal('word')">
+        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto z-60">
           <div>
             <p class="float-left">new word</p> 
             <button v-on:click="toggleModal('word')" class="float-right">
@@ -71,8 +71,8 @@
           Select languages
         </button>
       </div>
-      <div v-if="showModalLanguage" class="flex justify-center fixed inline-block align-middle inset-0 z-50 items-center">
-        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4">
+      <div v-if="showModalLanguage" class="flex justify-center fixed inset-0 z-50 items-center" v-on:click.self="toggleModal('language')">
+        <div class="p-6 rounded-lg shadow-lg bg-white overflow-auto h-3/4 z-60">
           <div>
             <p class="float-left">select languages</p> 
             <button v-on:click="toggleModal('language')" class="float-right">
@@ -100,9 +100,9 @@
         </div>
       </div>
     </div>
-    <div v-if="showModalWord" v-on:click.self="toggleModal('word')" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
-    <div v-if="showModalLanguage" v-on:click.self="toggleModal('language')" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
-  </div>
+    <div v-if="showModalWord" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
+    <div v-if="showModalLanguage" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
+  </div> 
 </template>
 
 <script>

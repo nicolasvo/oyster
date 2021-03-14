@@ -99,11 +99,11 @@
           </form>
         </div>
       </div>
-      <div class="flex justify-center">
+      <!-- <div class="flex justify-center">
         <button class="my-5 py-2 px-4 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none" v-on:click="nuke()">
           Nuke
         </button>
-      </div>
+      </div> -->
     </div>
     <div v-if="showModalWord" class="opacity-25 fixed inset-0 z-40 bg-black"></div>
     <div v-if="showModalLanguage" class="opacity-25 fixed inset-0 z-40 bg-black"></div>

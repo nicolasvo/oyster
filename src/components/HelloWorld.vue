@@ -317,6 +317,16 @@ export default {
       });
     }
   },
+  beforeUpdate() {
+    const expirationTime = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().expires_at;
+    console.log(`Token expiration time: ${expirationTime}`);
+    const now = Date.now();
+    if (expirationTime < now) {
+      reloadToken().then(() => {
+        console.log("Token reloaded.");
+      });
+    }
+  },
   mounted() {},
   methods: {
     nuke() {
@@ -471,6 +481,14 @@ function isSignedIn() {
             console.log(JSON.stringify(error, null, 2));
           }
         );
+    });
+  });
+}
+
+function reloadToken() {
+  return new Promise((resolve, reject) => {
+    gapi.auth2.getAuthInstance().currentUser.get().reloadAuthResponse().then(() => {
+      resolve(true);
     });
   });
 }

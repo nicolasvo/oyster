@@ -3,7 +3,7 @@
     <h1 class="mt-5 flex justify-center">{{ msg }}</h1>
     <div v-if="!isSignedIn" class="flex justify-center">
       <button
-        class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+        class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
         v-on:click="buttonSignIn"
       >
         Sign in
@@ -65,7 +65,7 @@
       </div>
       <div v-show="languages.length" class="flex justify-center">
         <button
-          class="mt-4 mb-2 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+          class="mt-4 mb-2 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
           v-on:click="toggleModal('word')"
         >
           Add word
@@ -101,7 +101,7 @@
             <div v-for="language in languages" :key="language">
               <span class="text-gray-700">{{ language }}</span>
               <input
-                class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:ring-2 focus:ring-opacity-50 focus:border-pink-400 focus:ring-pink-400"
+                class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:ring-2 focus:ring-opacity-50 focus:border-green-400 focus:ring-green-400"
                 type="text"
                 v-model="newWords[language]"
                 :placeholder="inputText"
@@ -109,7 +109,7 @@
             </div>
             <div class="flex justify-center">
               <button
-                class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+                class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
                 type="submit"
                 v-on:click="
                   buttonAddWord();
@@ -121,7 +121,7 @@
             </div>
             <div class="flex justify-center">
               <button
-                class="py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+                class="py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
                 v-on:click="toggleModal('word')"
               >
                 Close
@@ -132,7 +132,7 @@
       </div>
       <div class="flex justify-center">
         <button
-          class="my-2 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+          class="my-2 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
           v-on:click="toggleModal('language')"
         >
           Select languages
@@ -167,7 +167,7 @@
           <form v-on:submit.prevent>
             <div v-for="language in availableLanguages" :key="language">
               <input
-                class="my-2 rounded text-pink-500 checked:bg-pink-600"
+                class="my-2 rounded text-green-500 checked:bg-green-600"
                 type="checkbox"
                 v-model="selectedLanguages"
                 :value="language.code"
@@ -177,7 +177,7 @@
             </div>
             <div class="flex justify-center">
               <button
-                class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+                class="my-5 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
                 type="submit"
                 v-on:click="
                   buttonSelectLanguages();
@@ -189,7 +189,7 @@
             </div>
             <div class="flex justify-center">
               <button
-                class="py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-pink-500 hover:bg-pink-600"
+                class="py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-green-500 hover:bg-green-600"
                 v-on:click="toggleModal('language')"
               >
                 Close

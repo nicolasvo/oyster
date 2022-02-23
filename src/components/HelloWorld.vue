@@ -198,11 +198,11 @@
           </form>
         </div>
       </div>
-      <!-- <div class="flex justify-center">
-        <button class="my-5 py-2 px-4 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none" v-on:click="nuke()">
-          Nuke
+      <div class="flex justify-center">
+        <button class="my-2 py-2 px-4 text-white font-semibold rounded-lg shadow-md focus:outline-none bg-red-500 hover:bg-red-600" v-on:click="nuke()">
+          Sign out
         </button>
-      </div> -->
+      </div>
     </div>
     <div
       v-if="showModalWord"
@@ -330,9 +330,12 @@ export default {
   mounted() {},
   methods: {
     nuke() {
-      localStorage.clear();
-      gapi.auth2.getAuthInstance().disconnect();
-      console.log("clearing local storage!!!");
+      if (confirm('Are you sure? 🥲')) {
+        localStorage.clear();
+        gapi.auth2.getAuthInstance().disconnect();
+        console.log("clearing local storage!!! 🧨");
+        this.isSignedIn = false;
+      }
     },
     toggleModal(key) {
       if (key == "word") {

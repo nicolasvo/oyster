@@ -1,3 +1,5 @@
+backup/
+public/build/
 .DS_Store
 keys.json
 sheets_id.json

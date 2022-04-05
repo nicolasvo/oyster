@@ -1,40 +1,16 @@
-<script context="module">   export const ssr = false </script>
 <script>
-	const start = async () => {
-	  // Initializes the client with the API key and the Translate API.
-	  // @ts-ignore
-	  gapi.client.init({
-		'apiKey': 'YOUR_API_KEY',
-		'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/translate/v2/rest'],
-	  }).then(function() {
-		// Executes an API request, and returns a Promise.
-		// The method name `language.translations.list` comes from the API discovery.
-		return gapi.client.language.translations.list({
-		  q: 'hello world',
-		  source: 'en',
-		  target: 'de',
-		});
-	  }).then(function(response) {
-		console.log(response.result.data.translations[0].translatedText);
-	  }, function(reason) {
-		console.log('Error: ' + reason.result.error.message);
-	  });
-	};
-  
-	const initializeGapi = async () => {
-	  gapi.load('client', start);
-	}
+	import { onMount } from "svelte";
 
-	function boi() {
-		const CLIENT_ID =
-			"582485760308-aim00v0sor96v66bn2h4rgerqo1f1g74.apps.googleusercontent.com";
-		const API_KEY = "AIzaSyBUANl-jEVX7FlqOIGr3hVYrH3WUwvLFtU";
-		const DISCOVERY_DOCS = [
-			"https://sheets.googleapis.com/$discovery/rest?version=v4",
-			"https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-		];
-		const SCOPES =
-			"https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata";
+	const CLIENT_ID =
+		"582485760308-aim00v0sor96v66bn2h4rgerqo1f1g74.apps.googleusercontent.com";
+	const API_KEY = "AIzaSyBUANl-jEVX7FlqOIGr3hVYrH3WUwvLFtU";
+	const DISCOVERY_DOCS = [
+		"https://sheets.googleapis.com/$discovery/rest?version=v4",
+		"https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+	];
+	const SCOPES =
+		"https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata";
+	const start = async () => {
 		gapi.client
 			.init({
 				apiKey: API_KEY,
@@ -42,7 +18,7 @@
 				discoveryDocs: DISCOVERY_DOCS,
 				scope: SCOPES,
 			})
-			.then(function () {
+			.then(() => {
 				const isSignedIn = gapi.auth2
 					.getAuthInstance()
 					.isSignedIn.get();
@@ -52,12 +28,42 @@
 					console.log("User not signed in :/");
 				}
 			});
-	}
+	};
 
-	gapi.load("client", boi);
-  </script>
-  
-  <svelte:head>
-	<script src="https://apis.google.com/js/api.js" on:load={initializeGapi}></script>
-  </svelte:head>
-  
+	const initializeGapi = async () => {
+		gapi.load("client:auth2", start);
+	};
+
+	const signIn = async () => {
+		gapi.auth2.getAuthInstance().signIn();
+	};
+
+	const getConfig = async () => {
+		test = "boi"
+		gapi.client.drive.files
+			.list({
+				spaces: "appDataFolder",
+				fields: "nextPageToken, files(id, name)",
+				pageSize: 100,
+			})
+			.then((res) => {
+				if (res) {
+					console.log(res.result.files[0].id);
+				}
+				test = "end."
+			});
+	};
+
+	onMount(initializeGapi);
+	let test = "hee";
+</script>
+
+<svelte:head>
+	<script
+		src="https://apis.google.com/js/api.js"></script>
+</svelte:head>
+
+<h1 class="text-lime-600">this</h1>
+<p>{test}</p>
+<button on:click={signIn}>Sign in</button>
+<button on:click={getConfig}>Get config</button>

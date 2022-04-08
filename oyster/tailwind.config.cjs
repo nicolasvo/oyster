@@ -14,6 +14,7 @@ const config = {
         'greenish-dark': '#8ebd97',
         'blueish': '#39AEA9',
         'whiteish': '#FDF6EC',
+        'pinkish': '#FFA8A8',
       }
     },
   },

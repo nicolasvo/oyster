@@ -1,6 +1,6 @@
 <script>
-    import { onMount } from "svelte";
-    import { languages, words } from "../lib/store.js";
+    import { languages, words, isSignedIn } from "./store.js";
+    import Animation from "./Animation.svelte";
 
     const range = "A1:Z";
     const getContent = async (fileId) => {
@@ -14,6 +14,7 @@
             });
         return content;
     };
+
     const getConfig = async () => {
         const config = await gapi.client.drive.files
             .list({
@@ -28,8 +29,8 @@
             });
         return config;
     };
+
     const getWords = async (id) => {
-        console.log("moustache");
         const data = await gapi.client.sheets.spreadsheets.values
             .get({
                 spreadsheetId: id,
@@ -51,11 +52,12 @@
                     }
                     return data;
                 } else {
-                    console.log("No data in sheet");
+                    console.log("No data");
                 }
             });
         return data;
     };
+
     const getLanguages = async (id) => {
         const languages = await gapi.client.sheets.spreadsheets.values
             .get({
@@ -69,14 +71,13 @@
             });
         return languages;
     };
+
     const all = async () => {
-        console.log("shutdown");
         const config = await getConfig().then((config) => config);
         const content = await getContent(config).then((content) => content);
         const id = JSON.parse(content).sheetId;
         const words_ = await getWords(id).then((data) => data);
         const languages_ = await getLanguages(id).then((data) => data);
-        console.log(`palomino ${Object.keys(words_).length}`);
         words_.forEach((word) => {
             console.log(word);
         });
@@ -85,44 +86,43 @@
         $words = words_;
     };
 
-    // onMount(all);
+    $: if ($isSignedIn) {
+        all();
+    }
 </script>
 
-<button
-    class="m-5 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
-    on:click={all}
->
-    Show table
-</button>
 <div class="flex justify-center">
-    <table class="table-auto overflow-auto overflow-hidden rounded-xl">
-        <thead class="border-g bg-blueish">
-            <tr>
-                {#each $languages as language}
-                    <th
-                        scope="col"
-                        class="text-sm font-bold text-stone-100 px-6 py-4 text-center"
-                    >
-                        {language}
-                    </th>
-                {/each}
-            </tr>
-        </thead>
-        <tbody>
-            {#each $words as word}
-                <tr class="bg-stone-50 border-b">
-                    {#each $languages as language}
-                        <td class="text-sm text-blueish p-3 text-center">
-                            {word[language]}
-                        </td>
+    {#if $isSignedIn == true}
+        {#if $words.length}
+            <table class="table-auto overflow-auto overflow-hidden rounded-xl">
+                <thead class="border-g bg-blueish">
+                    <tr>
+                        {#each $languages as language}
+                            <th
+                                scope="col"
+                                class="text-sm font-bold text-stone-100 px-6 py-4 text-center"
+                            >
+                                {language}
+                            </th>
+                        {/each}
+                    </tr>
+                </thead>
+                <tbody>
+                    {#each $words as word}
+                        <tr class="bg-stone-50 border-b">
+                            {#each $languages as language}
+                                <td
+                                    class="text-sm text-blueish p-3 text-center"
+                                >
+                                    {word[language]}
+                                </td>
+                            {/each}
+                        </tr>
                     {/each}
-                </tr>
-            {/each}
-            <!-- <tr class="bg-stone-50 border-b">
-                <td class="text-sm text-blueish p-3 text-center"> Cell </td>
-                <td class="text-sm text-blueish p-3 text-center"> Cell </td>
-                <td class="text-sm text-blueish p-3 text-center"> Cell </td>
-            </tr> -->
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        {:else}
+            <Animation />
+        {/if}
+    {/if}
 </div>

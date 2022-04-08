@@ -89,11 +89,21 @@
     $: if ($isSignedIn) {
         all();
     }
+
+    const addWord = async () => {};
+    const toggleWordDialog = async () => {};
 </script>
 
 <div class="flex justify-center">
+    <button
+        class="m-5 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
+    >
+        Add word
+    </button>
+</div>
+<div class="flex justify-center">
     {#if $isSignedIn == true}
-        {#if $words.length}
+        {#if $languages.length}
             <table class="table-auto overflow-auto overflow-hidden rounded-xl">
                 <thead class="border-g bg-blueish">
                     <tr>

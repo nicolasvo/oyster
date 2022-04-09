@@ -319,7 +319,7 @@
                             {#each $languages as language}
                                 <th
                                     scope="col"
-                                    class="font-bold text-stone-100 px-6 py-4 text-center"
+                                    class="text-xs font-bold text-stone-100 px-6 py-4 text-center"
                                 >
                                     {availableLanguages.find(
                                         (o) => o.code === language

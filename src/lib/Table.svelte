@@ -65,6 +65,51 @@
         { code: "yi", name: "Yiddish" },
     ];
     const range = "A1:Z";
+    const createConfig = async () => {
+        const fileMetadata = {
+            name: "config.json",
+            parents: ["appDataFolder"],
+        };
+        const configId = await gapi.client.drive.files
+            .create({
+                resource: fileMetadata,
+                fields: "id",
+            })
+            .then((file) => {
+                if (file) {
+                    return file.result.id;
+                }
+            });
+        return configId;
+    };
+    const writeConfig = async (configId, sheetId) => {
+        await gapi.client.request({
+            path: "/upload/drive/v3/files/" + configId,
+            method: "PATCH",
+            params: {
+                uploadType: "media",
+            },
+            body: JSON.stringify({ sheetId: sheetId }),
+        });
+    };
+    const createSheet = async () => {
+        const resource = {
+            properties: {
+                title: "oyster_dictionary",
+            },
+        };
+        const sheetId = await gapi.client.sheets.spreadsheets
+            .create({
+                resource,
+                fields: "spreadsheetId",
+            })
+            .then((spreadsheet) => {
+                if (spreadsheet) {
+                    return spreadsheet.result.spreadsheetId;
+                }
+            });
+        return sheetId;
+    };
     const getContent = async (fileId) => {
         const content = await gapi.client.drive.files
             .get({
@@ -88,6 +133,9 @@
                 if (res) {
                     return res.result.files[0].id;
                 }
+            })
+            .catch(() => {
+                return false;
             });
         return config;
     };
@@ -116,8 +164,7 @@
                     }
                     return data;
                 } else {
-                    console.log("No data");
-                    noData = "Select languages first";
+                    noData = "Select some languages first, then add some words 🌺";
                     loadingState = false;
                 }
             });
@@ -140,9 +187,17 @@
 
     const all = async () => {
         loadingState = true;
-        const config = await getConfig().then((config) => config);
-        const content = await getContent(config).then((content) => content);
-        $sheetId = JSON.parse(content).sheetId;
+        const configId = await getConfig().then((configId) => configId);
+        if (configId) {
+            const content = await getContent(configId).then(
+                (content) => content
+            );
+            $sheetId = JSON.parse(content).sheetId;
+        } else {
+            const configId = await createConfig();
+            $sheetId = await createSheet();
+            await writeConfig(configId, $sheetId);
+        }
         $words = await getWords($sheetId).then((data) => data);
         $languages = await getLanguages($sheetId).then((data) => data);
         loadingState = false;
@@ -153,7 +208,6 @@
     }
 
     $: if ($languages.length > 0) {
-        console.log("ground control");
         noData = false;
     }
 

@@ -44,8 +44,10 @@
     };
 
     const signOut = async () => {
-        await gapi.auth2.getAuthInstance().disconnect();
-        $isSignedIn = false;
+        if (confirm("Are you sure? 🥲")) {
+            await gapi.auth2.getAuthInstance().disconnect();
+            $isSignedIn = false;
+        }
     };
 
     onMount(initializeGapi);

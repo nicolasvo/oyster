@@ -211,7 +211,6 @@
         noData = false;
     }
 
-    // async function addWord(e) {
     const addWord = async (e) => {
         loadingState = true;
         e.preventDefault();

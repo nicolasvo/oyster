@@ -8,6 +8,6 @@ services:
       - /app/node_modules
       - .:/app/
     ports:
-      - "8080:8080"
+      - "8082:8080"
     stdin_open: true
     tty: true

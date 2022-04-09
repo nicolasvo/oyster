@@ -406,7 +406,7 @@
             {#each availableLanguages as language}
                 <li>
                     <a
-                        href="#"
+                        href=""
                         on:click={() => selectLanguages(language["code"])}
                         class="block py-2 px-4 hover:bg-gray-100"
                     >

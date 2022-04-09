@@ -59,14 +59,14 @@
     {#if $isSignedIn == true || $isSignedIn == false}
         {#if !$isSignedIn}
             <button
-                class="m-5 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
+                class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
                 on:click={signIn}
             >
                 Sign in
             </button>
         {:else}
             <button
-                class="m-5 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
+                class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-greenish hover:bg-greenish-dark"
                 on:click={signOut}
             >
                 Sign out

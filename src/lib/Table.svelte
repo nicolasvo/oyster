@@ -361,6 +361,50 @@
     </div>
 {/if}
 <div class="flex justify-center">
+    <!-- https://flowbite.com/docs/components/dropdowns/ -->
+    <button
+        id="dropdownDefault"
+        data-dropdown-toggle="dropdown"
+        class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-blueish hover:bg-blueish-dark"
+        type="button"
+        >Select languages
+    </button>
+
+    <div
+        id="dropdown"
+        class="hidden z-10 w-55 bg-stone-50 rounded-md divide-y divide-gray-100 shadow"
+        data-popper-placement="bottom"
+    >
+        <ul class="py-1 text-blueish" aria-labelledby="dropdownDefault">
+            {#each availableLanguages as language}
+                <li>
+                    <a
+                        href="#"
+                        on:click={() => selectLanguages(language["code"])}
+                        class="block py-2 px-4 hover:bg-gray-100"
+                    >
+                        {#if $languages.includes(language["code"])}
+                            {language["name"]}
+                            <svg
+                                class="object-scale-down h-5 fill-greenish-dark inline-block align-top"
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="24px"
+                                viewBox="0 0 24 24"
+                                width="24px"
+                                ><path d="M0 0h24v24H0V0z" fill="none" /><path
+                                    d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
+                                /></svg
+                            >
+                        {:else}
+                            {language["name"]}
+                        {/if}
+                    </a>
+                </li>
+            {/each}
+        </ul>
+    </div>
+</div>
+<div class="flex justify-center">
     {#if wordForm}
         <form on:submit={addWord}>
             <div class="grid content-center">
@@ -385,52 +429,6 @@
             </div>
         </form>
     {:else}
-        <!-- https://flowbite.com/docs/components/dropdowns/ -->
-        <button
-            id="dropdownDefault"
-            data-dropdown-toggle="dropdown"
-            class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-blueish hover:bg-blueish-dark"
-            type="button"
-            >Select languages
-        </button>
-
-        <div
-            id="dropdown"
-            class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow"
-            data-popper-placement="bottom"
-        >
-            <ul class="py-1 text-blueish" aria-labelledby="dropdownDefault">
-                {#each availableLanguages as language}
-                    <li>
-                        <a
-                            href="#"
-                            on:click={() => selectLanguages(language["code"])}
-                            class="block py-2 px-4 hover:bg-gray-50"
-                        >
-                            {#if $languages.includes(language["code"])}
-                                {language["name"]}
-                                <svg
-                                    class="object-scale-down h-5 fill-greenish-dark inline-block align-top"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    height="24px"
-                                    viewBox="0 0 24 24"
-                                    width="24px"
-                                    ><path
-                                        d="M0 0h24v24H0V0z"
-                                        fill="none"
-                                    /><path
-                                        d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"
-                                    /></svg
-                                >
-                            {:else}
-                                {language["name"]}
-                            {/if}
-                        </a>
-                    </li>
-                {/each}
-            </ul>
-        </div>
-
         <button
             class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-blueish hover:bg-blueish-dark"
             on:click={toggleWordForm}

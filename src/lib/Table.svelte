@@ -92,6 +92,8 @@
         return config;
     };
 
+    let noData;
+
     const getWords = async (id) => {
         const data = await gapi.client.sheets.spreadsheets.values
             .get({
@@ -100,7 +102,7 @@
             })
             .then((response) => {
                 const range = response.result;
-                if (range.values.length > 0) {
+                if (range.values && range.values.length > 0) {
                     const languages = range.values[0];
                     const data = [];
                     let temp = {};
@@ -115,6 +117,8 @@
                     return data;
                 } else {
                     console.log("No data");
+                    noData = "Select languages first";
+                    loadingState = false;
                 }
             });
         return data;
@@ -128,7 +132,7 @@
             })
             .then((response) => {
                 const range = response.result;
-                const languages = range.values[0];
+                const languages = range.values ? range.values[0] : [];
                 return languages;
             });
         return languages;
@@ -144,6 +148,11 @@
 
     $: if ($isSignedIn) {
         all();
+    }
+
+    $: if ($languages.length > 0) {
+        console.log("ground control");
+        noData = false;
     }
 
     // async function addWord(e) {
@@ -294,6 +303,9 @@
 </script>
 
 <div class="flex justify-center">
+    {#if noData}
+        <p class="p-5 text-blueish">{noData}</p>
+    {/if}
     {#if $isSignedIn == true}
         {#if $languages.length}
             <table
@@ -316,42 +328,49 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {#each $words as word, i}
-                        <tr class="bg-stone-50 border-b">
-                            {#each $languages as language}
+                    {#if $words.length}
+                        {#each $words as word, i}
+                            <tr class="bg-stone-50 border-b">
+                                {#each $languages as language}
+                                    <td class="text-blueish p-3 text-center">
+                                        {#if word[language]}
+                                            {word[language]}
+                                        {/if}
+                                    </td>
+                                {/each}
                                 <td class="text-blueish p-3 text-center">
-                                    {#if word[language]}
-                                        {word[language]}
-                                    {/if}
-                                </td>
-                            {/each}
-                            <td class="text-blueish p-3 text-center">
-                                <button
-                                    class="flex justify-center items-center"
-                                    on:click={() => deleteWord(i + 1)}
-                                >
-                                    <svg
-                                        class="object-scale-down h-5 stroke-greenish-dark"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 25 25"
-                                        fill="none"
-                                        stroke="currentColor"
+                                    <button
+                                        class="flex justify-center items-center"
+                                        on:click={() => deleteWord(i + 1)}
                                     >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                        />
-                                    </svg>
-                                </button>
-                            </td>
+                                        <svg
+                                            class="object-scale-down h-5 stroke-greenish-dark"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 25 25"
+                                            fill="none"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                            />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        {/each}
+                    {:else}
+                        <tr class="bg-stone-50 border-b">
+                            {#each $languages as _}
+                                <td class="p-3" />
+                            {/each}
+                            <td class="p-3" />
                         </tr>
-                    {/each}
+                    {/if}
                 </tbody>
             </table>
-        {:else}
-            <Animation />
         {/if}
     {/if}
 </div>

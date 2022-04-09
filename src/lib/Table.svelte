@@ -321,7 +321,9 @@
                                     scope="col"
                                     class="font-bold text-stone-100 px-6 py-4 text-center"
                                 >
-                                    {language}
+                                    {availableLanguages.find(
+                                        (o) => o.code === language
+                                    ).name}
                                 </th>
                             {/each}
                             <th

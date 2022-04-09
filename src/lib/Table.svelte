@@ -139,11 +139,13 @@
     };
 
     const all = async () => {
+        loadingState = true;
         const config = await getConfig().then((config) => config);
         const content = await getContent(config).then((content) => content);
         $sheetId = JSON.parse(content).sheetId;
         $words = await getWords($sheetId).then((data) => data);
         $languages = await getLanguages($sheetId).then((data) => data);
+        loadingState = false;
     };
 
     $: if ($isSignedIn) {

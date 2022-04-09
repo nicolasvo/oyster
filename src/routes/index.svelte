@@ -3,7 +3,7 @@
 	import Table from "../lib/Table.svelte";
 </script>
 
-<div class="container p-10">
+<div class="container max-w-full p-10">
 	<h1 class="text-blueish text-4xl font-bold flex justify-center">words</h1>
 	<Table />
 	<Auth />

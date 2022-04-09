@@ -397,7 +397,7 @@
 
     <div
         id="dropdown"
-        class="hidden z-10 w-55 h-60 bg-stone-50 rounded-md divide-y divide-gray-100 overflow-y-scroll shadow"
+        class="hidden z-10 w-64 h-60 bg-stone-50 rounded-md divide-y divide-gray-100 overflow-y-scroll shadow"
         data-popper-placement="bottom"
     >
         <ul class="py-1 text-blueish" aria-labelledby="dropdownDefault">

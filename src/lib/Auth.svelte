@@ -44,7 +44,7 @@
     };
 
     const signOut = async () => {
-        if (confirm("Are you sure? 🥲")) {
+        if (confirm("Are you sure you want to sign out? 🥲")) {
             await gapi.auth2.getAuthInstance().disconnect();
             $isSignedIn = false;
         }

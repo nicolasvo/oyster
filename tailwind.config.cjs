@@ -10,7 +10,7 @@ const config = {
       },
       colors: {
         'beige': '#E5EFC1',
-        'greenish': '#A2D5AB',
+        'greenish': '#8bc295',
         'greenish-dark': '#8ebd97',
         'blueish': '#39AEA9',
         'blueish-dark': '#319d97',

@@ -10,6 +10,14 @@ const config = {
     methodOverride: {
       allowed: ["PATCH", "DELETE"],
     },
+    vite: {
+      server: {
+        hmr: {
+          port: 8080,
+          clientPort: 8082
+        }
+      }
+    }
   },
 
   preprocess: [

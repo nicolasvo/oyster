@@ -205,6 +205,10 @@
 
     $: if ($isSignedIn) {
         all();
+        isHidden = ""
+    }
+    $: if (!$isSignedIn) {
+        isHidden = "hidden"
     }
 
     $: if ($languages.length > 0) {
@@ -355,6 +359,7 @@
     const toggleWordForm = async () => {
         wordForm = !wordForm;
     };
+    let isHidden = "hidden";
 </script>
 
 <div class="flex justify-center">
@@ -445,7 +450,7 @@
     <button
         id="dropdownDefault"
         data-dropdown-toggle="dropdown"
-        class="m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-blueish hover:bg-blueish-dark"
+        class="{isHidden} m-3 p-3 text-stone-100 font-semibold rounded-xl shadow-md focus:outline-none bg-blueish hover:bg-blueish-dark"
         type="button"
         >Select languages
     </button>
@@ -484,7 +489,7 @@
         </ul>
     </div>
 </div>
-<div class="flex justify-center">
+<div class="{isHidden} flex justify-center">
     {#if wordForm}
         <form on:submit={addWord}>
             <div class="grid content-center">

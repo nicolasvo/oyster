@@ -370,7 +370,7 @@
         {#if $languages.length}
             <div class="overflow-x-auto">
                 <table
-                    class="m-3 table-auto overflow-auto overflow-hidden rounded-xl"
+                    class="my-3 table-auto overflow-auto overflow-hidden rounded-xl"
                 >
                     <thead class="border-g bg-blueish">
                         <tr>
